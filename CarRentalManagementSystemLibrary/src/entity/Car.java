@@ -23,7 +23,7 @@ public class Car implements Serializable {
     @Column(length = 16, nullable = false, unique = true)
     private String licensePlate;
     @Column(length = 32, nullable = false)
-    private String color;
+    private String colour;
     @Column(nullable = false)
     private Boolean availabilityStatus;
     @Column(nullable = false)
@@ -37,6 +37,9 @@ public class Car implements Serializable {
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
     
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Outlet outlet;
 
     public Car() {
         this.availabilityStatus = true;
@@ -46,7 +49,7 @@ public class Car implements Serializable {
     public Car(String licensePlate, String color) {
         this();
         this.licensePlate = licensePlate;
-        this.color = color;
+        this.colour = color;
     }
     
     
@@ -99,17 +102,17 @@ public class Car implements Serializable {
     }
 
     /**
-     * @return the color
+     * @return the colour
      */
-    public String getColor() {
-        return color;
+    public String getColour() {
+        return colour;
     }
 
     /**
-     * @param color the color to set
+     * @param colour the colour to set
      */
-    public void setColor(String color) {
-        this.color = color;
+    public void setColour(String colour) {
+        this.colour = colour;
     }
 
     /**
@@ -166,6 +169,20 @@ public class Car implements Serializable {
      */
     public void setCarCategory(CarCategory carCategory) {
         this.carCategory = carCategory;
+    }
+
+    /**
+     * @return the outlet
+     */
+    public Outlet getOutlet() {
+        return outlet;
+    }
+
+    /**
+     * @param outlet the outlet to set
+     */
+    public void setOutlet(Outlet outlet) {
+        this.outlet = outlet;
     }
 
 }

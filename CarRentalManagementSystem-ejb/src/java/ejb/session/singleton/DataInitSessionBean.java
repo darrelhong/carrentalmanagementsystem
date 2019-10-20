@@ -65,7 +65,7 @@ public class DataInitSessionBean {
             outlet.getEmployees().add(admin);
             outlet.getEmployees().add(sales);
             outlet.getEmployees().add(operations);
-            outletSessionBeanLocal.createNewOutletWithEmployees(outlet);
+            outlet = outletSessionBeanLocal.createNewOutletWithEmployees(outlet);
 
             CarCategory luxurySedan = new CarCategory("Luxury Sedan");
             CarCategory familySedan = new CarCategory("Family Sedan");
@@ -76,23 +76,50 @@ public class DataInitSessionBean {
             standardSedan = carCategorySessionBeanLocal.createNewCarCategory(standardSedan);
             suvMinivan = carCategorySessionBeanLocal.createNewCarCategory(suvMinivan);
 
-            CarModel mercedesEClass = new CarModel("Mercedes", "E-class");
-            CarModel toyotaCamry = new CarModel("Toyota", "Camry");
-            CarModel mazda3 = new CarModel("Mazda", "3");
-            CarModel nissanXTrail = new CarModel("Nissan", "X-Trail");
-            mercedesEClass = carModelSessionBeanLocal.createNewCarModel(mercedesEClass, luxurySedan);
-            toyotaCamry = carModelSessionBeanLocal.createNewCarModel(toyotaCamry, familySedan);
-            mazda3 = carModelSessionBeanLocal.createNewCarModel(mazda3, standardSedan);
-            nissanXTrail = carModelSessionBeanLocal.createNewCarModel(nissanXTrail, suvMinivan);
+            CarModel mercedesEClassModel = new CarModel("Mercedes", "E-class");
+            CarModel toyotaCamryModel = new CarModel("Toyota", "Camry");
+            CarModel mazda3Model = new CarModel("Mazda", "3");
+            CarModel nissanXTrailModel = new CarModel("Nissan", "X-Trail");
+            mercedesEClassModel = carModelSessionBeanLocal.createNewCarModel(mercedesEClassModel, luxurySedan);
+            toyotaCamryModel = carModelSessionBeanLocal.createNewCarModel(toyotaCamryModel, familySedan);
+            mazda3Model = carModelSessionBeanLocal.createNewCarModel(mazda3Model, standardSedan);
+            nissanXTrailModel = carModelSessionBeanLocal.createNewCarModel(nissanXTrailModel, suvMinivan);
 
             Car eclass1 = new Car("SMA 123", "silver");
             Car eclass2 = new Car("SMA 456", "silver");
             Car eclass3 = new Car("SMA 789", "black");
             Car eclass4 = new Car("SMA 101112", "black");
-            carSessionBeanLocal.createNewCar(eclass1, luxurySedan, mercedesEClass);
-            carSessionBeanLocal.createNewCar(eclass2, luxurySedan, mercedesEClass);
-            carSessionBeanLocal.createNewCar(eclass3, luxurySedan, mercedesEClass);
-            carSessionBeanLocal.createNewCar(eclass4, luxurySedan, mercedesEClass);
+            carSessionBeanLocal.createNewCar(eclass1, luxurySedan, mercedesEClassModel, outlet);
+            carSessionBeanLocal.createNewCar(eclass2, luxurySedan, mercedesEClassModel, outlet);
+            carSessionBeanLocal.createNewCar(eclass3, luxurySedan, mercedesEClassModel, outlet);
+            carSessionBeanLocal.createNewCar(eclass4, luxurySedan, mercedesEClassModel, outlet);
+           
+            Car camry1 = new Car("SMB 123", "silver");
+            Car camry2 = new Car("SMB 456", "silver");
+            Car camry3 = new Car("SMB 789", "white");
+            Car camry4 = new Car("SMB 101112", "white");
+            carSessionBeanLocal.createNewCar(camry1, familySedan, toyotaCamryModel, outlet);
+            carSessionBeanLocal.createNewCar(camry2, familySedan, toyotaCamryModel, outlet);
+            carSessionBeanLocal.createNewCar(camry3, familySedan, toyotaCamryModel, outlet);
+            carSessionBeanLocal.createNewCar(camry4, familySedan, toyotaCamryModel, outlet);
+            
+            Car mazda31 = new Car("SMC 123", "red");
+            Car mazda32 = new Car("SMC 456", "red");
+            Car mazda33 = new Car("SMC 789", "blue");
+            Car mazda34 = new Car("SMC 101112", "blue");
+            carSessionBeanLocal.createNewCar(mazda31, standardSedan, mazda3Model, outlet);
+            carSessionBeanLocal.createNewCar(mazda32, standardSedan, mazda3Model, outlet);
+            carSessionBeanLocal.createNewCar(mazda33, standardSedan, mazda3Model, outlet);
+            carSessionBeanLocal.createNewCar(mazda34, standardSedan, mazda3Model, outlet);
+            
+            Car nissanXTrail1 = new Car("SMD 123", "orange");
+            Car nissanXTrail2 = new Car("SMD 456", "white");
+            Car nissanXTrail3 = new Car("SMD 789", "blue");
+            Car nissanXTrail4 = new Car("SMD 101112", "silver");
+            carSessionBeanLocal.createNewCar(nissanXTrail1, suvMinivan, nissanXTrailModel, outlet);
+            carSessionBeanLocal.createNewCar(nissanXTrail2, suvMinivan, nissanXTrailModel, outlet);
+            carSessionBeanLocal.createNewCar(nissanXTrail3, suvMinivan, nissanXTrailModel, outlet);
+            carSessionBeanLocal.createNewCar(nissanXTrail4, suvMinivan, nissanXTrailModel, outlet);
 
         } catch (UnknownPersistenceException ex) {
             ex.printStackTrace();

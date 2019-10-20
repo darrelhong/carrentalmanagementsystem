@@ -1,12 +1,14 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -35,4 +37,9 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         }
     }
 
+    @Override
+    public List retrieveAllCarCategories() {
+        Query query = em.createQuery("SELECT c from CarCategory c ORDER BY c.carCategoryId");
+        return query.getResultList();
+    }
 }

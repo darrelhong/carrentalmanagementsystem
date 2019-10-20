@@ -30,6 +30,9 @@ public class Outlet implements Serializable {
 
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
+    
+    @OneToMany(mappedBy = "outlet")
+    private List<Car> cars;
 
     public Outlet() {
         employees = new ArrayList<>();
@@ -143,6 +146,20 @@ public class Outlet implements Serializable {
      */
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
+    }
+
+    /**
+     * @return the cars
+     */
+    public List<Car> getCars() {
+        return cars;
+    }
+
+    /**
+     * @param cars the cars to set
+     */
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
     }
 
 }

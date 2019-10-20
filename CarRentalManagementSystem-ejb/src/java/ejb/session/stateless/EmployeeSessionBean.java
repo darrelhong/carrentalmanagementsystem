@@ -1,6 +1,8 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import javax.ejb.Local;
+import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -15,6 +17,8 @@ import util.exception.InvalidLoginCredentialsException;
  * @author darre
  */
 @Stateless
+@Local(EmployeeSessionBeanLocal.class)
+@Remote(EmployeeSessionBeanRemote.class)
 public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeSessionBeanLocal {
 
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
@@ -27,7 +31,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException {
         Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :inUsername");
         query.setParameter("inUsername", username);
-        
+
         try {
             return (Employee) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {

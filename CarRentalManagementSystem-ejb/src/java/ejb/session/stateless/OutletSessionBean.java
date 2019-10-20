@@ -2,12 +2,14 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Outlet;
+import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -38,6 +40,12 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create new outlet with employess " + ex.getMessage());
         }
+    }
+
+    @Override
+    public List retrieveAllOutlets() {
+        Query query = em.createQuery("SELECT o from Outlet o ORDER BY o.outletId");
+        return query.getResultList();
     }
 
 }
