@@ -114,9 +114,9 @@ public class OperationsModule {
         System.out.print("Enter new car model category ID> ");
         Long categoryId = Long.parseLong(sc.nextLine().trim());
         System.out.print("Enter new car make> ");
-        newCarModel.setMake(sc.nextLine().trim());
+        newCarModel.setMake(returnNonEmptyString(sc));
         System.out.print("Enter new car model> ");
-        newCarModel.setModel(sc.nextLine().trim());
+        newCarModel.setModel(returnNonEmptyString(sc));
 
         try {
             newCarModel = carModelSessionBeanRemote.createNewCarModel(newCarModel, categoryId);
@@ -163,7 +163,7 @@ public class OperationsModule {
             System.out.println(ex.getMessage());
             return;
         }
-        
+
         List<CarCategory> categories = carCategorySessionBeanRemote.retrieveAllCarCategories();
         System.out.println("List of car categories:");
         System.out.printf("%11s%20s\n", "Category ID", "Category Name");
@@ -261,9 +261,9 @@ public class OperationsModule {
         Long outletId = Long.parseLong(sc.nextLine().trim());
 
         System.out.print("Enter new car license plate> ");
-        newCar.setLicensePlate(sc.nextLine().trim());
+        newCar.setLicensePlate(returnNonEmptyString(sc));
         System.out.print("Enter new car colour> ");
-        newCar.setColour(sc.nextLine().trim());
+        newCar.setColour(returnNonEmptyString(sc));
 
         try {
             newCar = carSessionBeanRemote.createNewCar(newCar, categoryId, modelId, outletId);
@@ -435,5 +435,18 @@ public class OperationsModule {
         }
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
+    }
+
+    private String returnNonEmptyString(Scanner sc) {
+        String result = "";
+        while (true) {
+            result = sc.nextLine().trim();
+            if (result.length() > 0) {
+                break;
+            } else {
+                System.out.println("Non empty string required!");
+            }
+        }
+        return result;
     }
 }

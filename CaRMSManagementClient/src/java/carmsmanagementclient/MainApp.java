@@ -124,7 +124,7 @@ public class MainApp {
                 } else if (response == 3) {
                     break;
                 } else {
-                    System.out.println("Invalid option, please try again.");
+                    System.out.println("Invalid option, please try again.\n");
                 }
 
             }
