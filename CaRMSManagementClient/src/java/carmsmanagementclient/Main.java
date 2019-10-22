@@ -32,6 +32,7 @@ public class Main {
         MainApp mainApp = new MainApp(employeeSessionBeanRemote, carModelSessionBeanRemote, 
                 carSessionBeanRemote, carCategorySessionBeanRemote, outletSessionBeanRemote);
         mainApp.runApp();
+        System.out.println("thdtr");
     }
     
 }
