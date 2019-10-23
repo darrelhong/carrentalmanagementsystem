@@ -30,9 +30,13 @@ public class CarCategory implements Serializable {
     @OneToMany(mappedBy = "carCategory")
     private List<Car> cars;
 
+    @OneToMany(mappedBy = "carCategory", orphanRemoval = true)
+    private List<RentalRate> rentalRates;
+    
     public CarCategory() {
         this.cars = new ArrayList<>();
         this.carModels = new ArrayList<>();
+        this.rentalRates = new ArrayList<>();
     }
 
     public CarCategory(String carCategory) {
@@ -113,6 +117,20 @@ public class CarCategory implements Serializable {
      */
     public void setCars(List<Car> cars) {
         this.cars = cars;
+    }
+
+    /**
+     * @return the rentalRates
+     */
+    public List<RentalRate> getRentalRates() {
+        return rentalRates;
+    }
+
+    /**
+     * @param rentalRates the rentalRates to set
+     */
+    public void setRentalRates(List<RentalRate> rentalRates) {
+        this.rentalRates = rentalRates;
     }
     
 }

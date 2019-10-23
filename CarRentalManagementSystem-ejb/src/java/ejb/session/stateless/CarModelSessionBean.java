@@ -28,7 +28,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     public CarModelSessionBean() {
     }
-
+    // For local client
     @Override
     public CarModel createNewCarModel(CarModel newCarModel, CarCategory carCategory) throws UnknownPersistenceException {
         CarCategory cat = em.find(CarCategory.class, carCategory.getCarCategoryId());
@@ -42,7 +42,8 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
             throw new UnknownPersistenceException("Could not create card model " + ex.getMessage());
         }
     }
-
+    
+    // For remote client
     @Override
     public CarModel createNewCarModel(CarModel newCarModel, Long categoryId) throws UnknownPersistenceException, CarCategoryNotFoundException {
         CarCategory cat = em.find(CarCategory.class, categoryId);

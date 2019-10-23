@@ -111,6 +111,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         toDelete.getCarModel().getCars().remove(toDelete);
         toDelete.getCarCategory().getCars().remove(toDelete);
+        // To edit when RentalRecord is implemented
         if (toDelete.getAvailabilityStatus()) {
             em.remove(toDelete);
             return 0;
@@ -121,24 +122,24 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public Car updateCar(Car car, Long categoryId, Long modelId, Long outletId) throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException {
-        CarCategory newCat = em.find(CarCategory.class, categoryId);
+    public Car updateCar(Car car, Long carCategoryId, Long modelId, Long outletId) throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException {
+        CarCategory newCat = em.find(CarCategory.class, carCategoryId);
         if (newCat == null) {
-            throw new CarCategoryNotFoundException("Car category ID " + categoryId + " does not exist!");
+            throw new CarCategoryNotFoundException("Car category ID " + carCategoryId + " does not exist!");
         }
-        newCat.getCars().size();
+//        newCat.getCars().size();
         CarModel newModel = em.find(CarModel.class, modelId);
         if (newModel == null) {
             throw new CarModelNotFoundException("Car model ID " + modelId + " does not exist!");
         }
-        newModel.getCars().size();
+//        newModel.getCars().size();
         Outlet newOutlet = em.find(Outlet.class, outletId);
         if (newOutlet == null) {
             throw new OutletNotFoundException("Outlet ID " + outletId + " does not exist!");
         }
-        newOutlet.getCars().size();
+//        newOutlet.getCars().size();
         Car carToUpdate = em.find(Car.class, car.getCarId());
-        if (carToUpdate.getCarCategory().getCarCategoryId() != categoryId) {
+        if (carToUpdate.getCarCategory().getCarCategoryId() != carCategoryId) {
             carToUpdate.getCarCategory().getCars().remove(carToUpdate);
             carToUpdate.setCarCategory(newCat);
             newCat.getCars().add(carToUpdate);

@@ -109,7 +109,11 @@ public class MainApp {
     }
 
     private void doSearchCar() {
-        System.out.println("Not yet supported");
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** CaRMS Reservation Client :: Search Car ***\n");
+        System.out.println("Unsupported action");
+        System.out.println("\nPress Enter to continue...");
+        sc.nextLine();
     }
 
     private void menuCustomer() {
@@ -121,7 +125,7 @@ public class MainApp {
             System.out.println("1: Search Car");
             System.out.println("2: View All Reservations");
             System.out.println("3: View Reservation Details");
-            System.out.println("4: Logout");
+            System.out.println("4: Logout\n");
             response = 0;
 
             while (response < 1 || response > 4) {
@@ -148,11 +152,19 @@ public class MainApp {
     }
 
     private void doViewAllReservations() {
-        System.out.println("Not yet supported");
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** CaRMS Reservation Client :: View All Reservations ***\n");
+        System.out.println("Unsupported action");
+        System.out.println("\nPress Enter to continue...");
+        sc.nextLine();
     }
 
     private void doViewReservationDetails() {
-        System.out.println("Not yet supported");
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
+        System.out.println("Unsupported action");
+        System.out.println("\nPress Enter to continue...");
+        sc.nextLine();
     }
 
     private String returnNonEmptyString(Scanner sc) {

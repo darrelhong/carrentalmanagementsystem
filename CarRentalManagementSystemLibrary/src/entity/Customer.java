@@ -20,7 +20,7 @@ public class Customer implements Serializable {
     private Long customerId;
     @Column(length = 32, nullable = false)
     private String name;
-    @Column(length = 64, nullable = false)
+    @Column(length = 64, nullable = false, unique = true)
     private String email;
     @Column(length = 64, nullable = false)
     private String password;

@@ -5,11 +5,16 @@ import ejb.session.stateless.CarModelSessionBeanLocal;
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
+import ejb.session.stateless.RentalRateSessionBeanLocal;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
+import entity.RentalRate;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -27,6 +32,9 @@ import util.exception.UnknownPersistenceException;
 @LocalBean
 @Startup
 public class DataInitSessionBean {
+
+    @EJB(name = "RentalRateSessionBeanLocal")
+    private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
 
     @EJB(name = "CarSessionBeanLocal")
     private CarSessionBeanLocal carSessionBeanLocal;
@@ -76,6 +84,23 @@ public class DataInitSessionBean {
             standardSedan = carCategorySessionBeanLocal.createNewCarCategory(standardSedan);
             suvMinivan = carCategorySessionBeanLocal.createNewCarCategory(suvMinivan);
 
+            RentalRate luxurySedanPeakRate = new RentalRate("Luxury Sedan Peak Rate", new BigDecimal(200), false, new ArrayList<>(Arrays.asList(6, 7)));
+            RentalRate luxurySedanNonPeakRate = new RentalRate("Luxury Sedan Non-peak Rate", new BigDecimal(250), false, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
+            RentalRate familySedanPeakRate = new RentalRate("Family Sedan Peak Rate", new BigDecimal(180), false, new ArrayList<>(Arrays.asList(6, 7)));
+            RentalRate familySedanNonPeakRate = new RentalRate("Family Sedan Non-peak Rate", new BigDecimal(150), false, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
+            RentalRate standardSedanPeakRate = new RentalRate("Standard Sedan Peak Rate", new BigDecimal(120), false, new ArrayList<>(Arrays.asList(6, 7)));
+            RentalRate standardSedanNonPeakRate = new RentalRate("Standard Sedan Non-peak Rate", new BigDecimal(100), false, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
+            RentalRate suvMinivanPeakRate = new RentalRate("SUV/Minivan Peak Rate", new BigDecimal(190), false, new ArrayList<>(Arrays.asList(6, 7)));
+            RentalRate suvMinivanNonPeakRate = new RentalRate("SUV/Minivan Non-peak Rate", new BigDecimal(170), false, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
+            rentalRateSessionBeanLocal.createRentalRate(luxurySedanPeakRate, luxurySedan);
+            rentalRateSessionBeanLocal.createRentalRate(luxurySedanNonPeakRate, luxurySedan);
+            rentalRateSessionBeanLocal.createRentalRate(familySedanPeakRate, familySedan);
+            rentalRateSessionBeanLocal.createRentalRate(familySedanNonPeakRate, familySedan);
+            rentalRateSessionBeanLocal.createRentalRate(standardSedanPeakRate, standardSedan);
+            rentalRateSessionBeanLocal.createRentalRate(standardSedanNonPeakRate, standardSedan);
+            rentalRateSessionBeanLocal.createRentalRate(suvMinivanPeakRate, suvMinivan);
+            rentalRateSessionBeanLocal.createRentalRate(suvMinivanNonPeakRate, suvMinivan);
+
             CarModel mercedesEClassModel = new CarModel("Mercedes", "E-class");
             CarModel toyotaCamryModel = new CarModel("Toyota", "Camry");
             CarModel mazda3Model = new CarModel("Mazda", "3");
@@ -93,7 +118,7 @@ public class DataInitSessionBean {
             carSessionBeanLocal.createNewCar(eclass2, luxurySedan, mercedesEClassModel, outlet);
             carSessionBeanLocal.createNewCar(eclass3, luxurySedan, mercedesEClassModel, outlet);
             carSessionBeanLocal.createNewCar(eclass4, luxurySedan, mercedesEClassModel, outlet);
-           
+
             Car camry1 = new Car("SMB 123", "silver");
             Car camry2 = new Car("SMB 456", "silver");
             Car camry3 = new Car("SMB 789", "white");
@@ -102,7 +127,7 @@ public class DataInitSessionBean {
             carSessionBeanLocal.createNewCar(camry2, familySedan, toyotaCamryModel, outlet);
             carSessionBeanLocal.createNewCar(camry3, familySedan, toyotaCamryModel, outlet);
             carSessionBeanLocal.createNewCar(camry4, familySedan, toyotaCamryModel, outlet);
-            
+
             Car mazda31 = new Car("SMC 123", "red");
             Car mazda32 = new Car("SMC 456", "red");
             Car mazda33 = new Car("SMC 789", "blue");
@@ -111,7 +136,7 @@ public class DataInitSessionBean {
             carSessionBeanLocal.createNewCar(mazda32, standardSedan, mazda3Model, outlet);
             carSessionBeanLocal.createNewCar(mazda33, standardSedan, mazda3Model, outlet);
             carSessionBeanLocal.createNewCar(mazda34, standardSedan, mazda3Model, outlet);
-            
+
             Car nissanXTrail1 = new Car("SMD 123", "orange");
             Car nissanXTrail2 = new Car("SMD 456", "white");
             Car nissanXTrail3 = new Car("SMD 789", "blue");

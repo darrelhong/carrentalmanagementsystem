@@ -7,5 +7,6 @@ package util.enumeration;
 public enum EmployeeType {
     ADMIN,
     OPERATIONS,
-    SALES
+    SALES,
+    CUSTOMERSERVICE
 }
