@@ -2,17 +2,18 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -31,8 +32,12 @@ public class RentalRate implements Serializable {
     private BigDecimal rate;
     private Boolean isPromo;
     private Boolean disabled;
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Integer> validityPeriod;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date startDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date endDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -40,23 +45,15 @@ public class RentalRate implements Serializable {
 
     public RentalRate() {
         this.disabled = false;
-        this.validityPeriod = new ArrayList<>();
     }
 
-    public RentalRate(String name, BigDecimal rate, Boolean isPromo, List<Integer> validityPeriod) {
+    public RentalRate(String name, BigDecimal rate, Boolean isPromo, Date startDate, Date endDate) {
         this();
         this.name = name;
         this.rate = rate;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.isPromo = isPromo;
-        this.validityPeriod = validityPeriod;
-    }
-
-    public void addValidDay(Integer day) {
-        this.validityPeriod.add(day);
-    }
-
-    public boolean removeValidDay(Integer day) {
-        return this.validityPeriod.remove(day);
     }
 
     public Long getRentalRateId() {
@@ -135,20 +132,6 @@ public class RentalRate implements Serializable {
     }
 
     /**
-     * @return the validityPeriod
-     */
-    public List<Integer> getValidityPeriod() {
-        return validityPeriod;
-    }
-
-    /**
-     * @param validityPeriod the validityPeriod to set
-     */
-    public void setValidityPeriod(List<Integer> validityPeriod) {
-        this.validityPeriod = validityPeriod;
-    }
-
-    /**
      * @return the carCategory
      */
     public CarCategory getCarCategory() {
@@ -174,6 +157,35 @@ public class RentalRate implements Serializable {
      */
     public void setIsPromo(Boolean isPromo) {
         this.isPromo = isPromo;
+    }
+
+    /**
+     * @param startDate the startDate to set
+     */
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * @return the endDate
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * @param endDate the endDate to set
+     */
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+
+    /**
+     * @return the startDate
+     */
+    public Date getStartDate() {
+        return startDate;
     }
 
 }

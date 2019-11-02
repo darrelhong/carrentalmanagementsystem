@@ -93,7 +93,8 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         rateToUpdate.setName(rentalRate.getName());
         rateToUpdate.setRate(rentalRate.getRate());
         rateToUpdate.setIsPromo(rentalRate.getIsPromo());
-        rateToUpdate.setValidityPeriod(rentalRate.getValidityPeriod());
+        rateToUpdate.setStartDate(rentalRate.getStartDate());
+        rateToUpdate.setEndDate(rentalRate.getEndDate());
         return rateToUpdate;
     }
 

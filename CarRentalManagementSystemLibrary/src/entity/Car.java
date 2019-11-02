@@ -1,6 +1,8 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -40,8 +43,12 @@ public class Car implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
+    
+    @OneToMany(mappedBy = "car")
+    private List<RentalRecord> rentalRecords;
 
     public Car() {
+        this.rentalRecords = new ArrayList<>();
         this.availabilityStatus = true;
         this.disabled = false;
     }
@@ -183,6 +190,20 @@ public class Car implements Serializable {
      */
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
+    }
+
+    /**
+     * @return the rentalRecords
+     */
+    public List<RentalRecord> getRentalRecords() {
+        return rentalRecords;
+    }
+
+    /**
+     * @param rentalRecords the rentalRecords to set
+     */
+    public void setRentalRecords(List<RentalRecord> rentalRecords) {
+        this.rentalRecords = rentalRecords;
     }
 
 }

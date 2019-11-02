@@ -19,6 +19,7 @@ import util.exception.EntityDisabledException;
 import util.exception.InvalidAccessRightsException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.helper.Print;
 
 /**
  *
@@ -113,10 +114,7 @@ public class OperationsModule {
 
         List<CarCategory> categories = carCategorySessionBeanRemote.retrieveAllCarCategories();
         System.out.println("List of car categories:");
-        System.out.printf("%11s%20s\n", "Category ID", "Category Name");
-        categories.forEach((cat) -> {
-            System.out.printf("%11s%20s\n", cat.getCarCategoryId().toString(), cat.getCarCategory());
-        });
+        Print.printListCarCategories(categories);
         System.out.print("Enter new car model category ID> ");
         Long categoryId = Long.parseLong(sc.nextLine().trim());
         System.out.print("Enter new car make> ");
@@ -127,8 +125,7 @@ public class OperationsModule {
         try {
             newCarModel = carModelSessionBeanRemote.createNewCarModel(newCarModel, categoryId);
             System.out.println("\nNew model created!");
-            System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-            System.out.printf("%8s%20s%20s%20s\n", newCarModel.getCarModelId(), newCarModel.getMake(), newCarModel.getModel(), newCarModel.getCarCategory().getCarCategory());
+            Print.printCarModel(newCarModel);
 //            System.out.println("New car model created. ID = " + newCarModel.getCarModelId() + ": " + newCarModel.getMake() + " " + newCarModel.getModel() + "\n");
         } catch (CarCategoryNotFoundException | UnknownPersistenceException ex) {
             System.out.println(ex.getMessage());
@@ -142,10 +139,7 @@ public class OperationsModule {
         System.out.println("*** Operations Module :: View All Car Models ***\n");
 
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
-        System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-        carModels.forEach((model) -> {
-            System.out.printf("%8s%20s%20s%20s\n", model.getCarModelId(), model.getMake(), model.getModel(), model.getCarCategory().getCarCategory());
-        });
+        Print.printListCarModels(carModels);
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
@@ -159,10 +153,8 @@ public class OperationsModule {
 
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
         System.out.println("List of car models");
-        System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-        carModels.forEach((model) -> {
-            System.out.printf("%8s%20s%20s%20s\n", model.getCarModelId(), model.getMake(), model.getModel(), model.getCarCategory().getCarCategory());
-        });
+        Print.printListCarModels(carModels);
+
         System.out.print("\n Enter model ID to update> ");
         Long modelId = Long.parseLong(sc.nextLine().trim());
         try {
@@ -175,10 +167,8 @@ public class OperationsModule {
 
         List<CarCategory> categories = carCategorySessionBeanRemote.retrieveAllCarCategories();
         System.out.println("List of car categories:");
-        System.out.printf("%11s%20s\n", "Category ID", "Category Name");
-        categories.forEach((cat) -> {
-            System.out.printf("%11s%20s\n", cat.getCarCategoryId().toString(), cat.getCarCategory());
-        });
+        Print.printListCarCategories(categories);
+
         System.out.print("Enter new car category ID (Leave blank if no change)> ");
         input = sc.nextLine().trim();
         if (input.length() > 0) {
@@ -197,9 +187,7 @@ public class OperationsModule {
         try {
             carModelToUpdate = carModelSessionBeanRemote.updateCarModel(carModelToUpdate, modelId, categoryId);
             System.out.println("\nCar model updated! New car model details:");
-            System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-            System.out.printf("%8s%20s%20s%20s\n", carModelToUpdate.getCarModelId(), carModelToUpdate.getMake(), carModelToUpdate.getModel(), carModelToUpdate.getCarCategory().getCarCategory());
-//            System.out.println("Car model ID = " + carModelToUpdate.getCarModelId() + " updated: " + carModelToUpdate.getMake() + " " + carModelToUpdate.getModel() + " " + carModelToUpdate.getCarCategory().getCarCategory());
+            Print.printCarModel(carModelToUpdate);
         } catch (CarCategoryNotFoundException | CarModelNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -214,13 +202,18 @@ public class OperationsModule {
 
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
         System.out.println("List of car models:");
-        System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-        carModels.forEach((model) -> {
-            System.out.printf("%8s%20s%20s%20s\n", model.getCarModelId(), model.getMake(), model.getModel(), model.getCarCategory().getCarCategory());
-        });
+        Print.printListCarModels(carModels);
+
         System.out.print("\nEnter model ID to delete/disable> ");
         Long modelId = Long.parseLong(sc.nextLine().trim());
-        System.out.println("Confirm delete car model ID " + modelId + "? (Enter 'Y' to confirm)");
+        try {
+            CarModel toDelete = carModelSessionBeanRemote.retrieveCarModelById(modelId);
+            Print.printCarModel(toDelete);
+        } catch (CarModelNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        System.out.println("Confirm delete car model? (Enter 'Y' to confirm)");
         input = sc.nextLine().trim().toLowerCase();
         if (input.equals("y")) {
             try {
@@ -247,28 +240,20 @@ public class OperationsModule {
 
         List<CarCategory> categories = carCategorySessionBeanRemote.retrieveAllCarCategories();
         System.out.println("List of car categories:");
-        System.out.printf("%11s%20s\n", "Category ID", "Category Name");
-        categories.forEach((cat) -> {
-            System.out.printf("%11s%20s\n", cat.getCarCategoryId().toString(), cat.getCarCategory());
-        });
+        Print.printListCarCategories(categories);
+
         System.out.print("\nEnter new car category ID> ");
         Long categoryId = Long.parseLong(sc.nextLine().trim());
 
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveCarModelsByCategory(categoryId);
         System.out.println("List of car models:");
-        System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-        carModels.forEach((model) -> {
-            System.out.printf("%8s%20s%20s%20s\n", model.getCarModelId(), model.getMake(), model.getModel(), model.getCarCategory().getCarCategory());
-        });
+        Print.printListCarModels(carModels);
         System.out.print("\nEnter new car model ID> ");
         Long modelId = Long.parseLong(sc.nextLine().trim());
 
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
         System.out.println("List of outlets:");
-        System.out.printf("%9s%32s\n", "Outlet ID", "Outlet Address");
-        outlets.forEach((outlet) -> {
-            System.out.printf("%9s%32s\n", outlet.getOutletId(), outlet.getAddress());
-        });
+        Print.printListOutlets(outlets);
         System.out.print("\nEnter new car outlet ID> ");
         Long outletId = Long.parseLong(sc.nextLine().trim());
 
@@ -280,15 +265,7 @@ public class OperationsModule {
         try {
             newCar = carSessionBeanRemote.createNewCar(newCar, categoryId, modelId, outletId);
             System.out.println("\nNew car created!");
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-            String status = newCar.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", newCar.getCarId(), status, newCar.getCarCategory().getCarCategory(), newCar.getCarModel().getMake(), newCar.getCarModel().getModel(), newCar.getLicensePlate(), newCar.getColour(), newCar.getOutlet().getOutletId());
-//            System.out.println("New car created. ID = " + newCar.getCarId() + " "
-//                    + newCar.getCarCategory().getCarCategory() + " " + newCar.getColour()
-//                    + " " + newCar.getCarModel().getMake()
-//                    + " " + newCar.getCarModel().getModel()
-//                    + " Plate No." + newCar.getLicensePlate()
-//                    + " at " + newCar.getOutlet().getAddress());
+            Print.printCar(newCar);
         } catch (UnknownPersistenceException | EntityDisabledException | CarCategoryNotFoundException
                 | CarModelNotFoundException | OutletNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -302,14 +279,8 @@ public class OperationsModule {
         System.out.println("*** Operations Module :: View All Cars ***\n");
 
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-        cars.forEach((car) -> {
-            String status = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(),
-                    status, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(),
-                    car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(),
-                    car.getOutlet().getOutletId());
-        });
+        Print.printListCars(cars);
+
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
@@ -320,25 +291,13 @@ public class OperationsModule {
         System.out.println("*** Operations Module :: View Car Details ***\n");
 
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-        cars.forEach((car) -> {
-            String status = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(),
-                    status, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(),
-                    car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(),
-                    car.getOutlet().getOutletId());
-        });
+        Print.printListCars(cars);
+
         System.out.print("\nEnter car ID to view> ");
         Long carId = Long.parseLong(sc.nextLine().trim());
         try {
             Car car = carSessionBeanRemote.retrieveCarById(carId);
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-            String carStatus = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(),
-                    carStatus, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(),
-                    car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(),
-                    car.getOutlet().getOutletId());
-
+            Print.printCar(car);
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.println("1: Update Car");
             System.out.println("2: Delete/Disable Car");
@@ -359,11 +318,9 @@ public class OperationsModule {
     private void doDeleteCar(Car car) {
         Scanner sc = new Scanner(System.in);
         String input = "";
-
         System.out.println("\n*** Operations Menu :: View Car Details :: Delete/Disable Car ***\n");
-        System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-        String carStatus = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
-        System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(), carStatus, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(), car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(), car.getOutlet().getOutletId());
+
+        Print.printCar(car);
         System.out.print("\nConfirm delete car? (Enter 'Y' to confirm)> ");
 //        System.out.println("Confirm delete car: " + car.getCarModel().getMake()
 //                + " " + car.getCarModel().getModel()
@@ -400,10 +357,9 @@ public class OperationsModule {
         System.out.println("*** Operations Module :: View Car Details :: Update Car ***\n");
 
         List<CarCategory> categories = carCategorySessionBeanRemote.retrieveAllCarCategories();
-        System.out.printf("%11s%20s\n", "Category ID", "Category Name");
-        categories.forEach((cat) -> {
-            System.out.printf("%11s%20s\n", cat.getCarCategoryId().toString(), cat.getCarCategory());
-        });
+        System.out.println("List of car categories: ");
+        Print.printListCarCategories(categories);
+
         System.out.print("Enter new car category ID (Leave blank if no change)> ");
         input = sc.nextLine().trim();
         if (input.length() > 0) {
@@ -411,10 +367,9 @@ public class OperationsModule {
         }
 
         List<CarModel> carModels = carModelSessionBeanRemote.retrieveCarModelsByCategory(carCategoryId);
-        System.out.printf("%8s%20s%20s%20s\n", "Model ID", "Make", "Model", "Category");
-        carModels.forEach((model) -> {
-            System.out.printf("%8s%20s%20s%20s\n", model.getCarModelId(), model.getMake(), model.getModel(), model.getCarCategory().getCarCategory());
-        });
+        System.out.println("List of car models: ");
+        Print.printListCarModels(carModels);
+
         System.out.print("Enter new car model ID (Leave blank if no change)> ");
         input = sc.nextLine().trim();
         if (input.length() > 0) {
@@ -422,10 +377,9 @@ public class OperationsModule {
         }
 
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
-        System.out.printf("%9s%32s\n", "Outlet ID", "Outlet Address");
-        outlets.forEach((outlet) -> {
-            System.out.printf("%9s%32s\n", outlet.getOutletId(), outlet.getAddress());
-        });
+        System.out.println("List of outlets: ");
+        Print.printListOutlets(outlets);
+
         System.out.print("\nEnter new car outlet ID (Leave blank if no change> ");
         input = sc.nextLine().trim();
         if (input.length() > 0) {
@@ -437,6 +391,7 @@ public class OperationsModule {
         if (input.length() > 0) {
             car.setLicensePlate(input);
         }
+
         System.out.print("Enter new car colour (Leave blank if no change)> ");
         input = sc.nextLine().trim();
         if (input.length() > 0) {
@@ -445,9 +400,7 @@ public class OperationsModule {
         try {
             car = carSessionBeanRemote.updateCar(car, carCategoryId, modelId, outletId);
             System.out.println("\nCar updated! New car details:");
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-            String carStatus = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
-            System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(), carStatus, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(), car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(), car.getOutlet().getOutletId());
+            Print.printCar(car);
         } catch (CarCategoryNotFoundException | CarModelNotFoundException | OutletNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
