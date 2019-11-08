@@ -101,7 +101,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
             throw new CarModelNotFoundException("Car model ID " + modelId + " does not exist!");
         }
         toDelete.getCarCategory().getCarModels().remove(toDelete);
-        if (toDelete.getCars().isEmpty()) {
+        if (toDelete.getCars().isEmpty() && toDelete.getRentalRecords().isEmpty()) {
             em.remove(toDelete);
             return 0;
         } else {

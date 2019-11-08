@@ -61,9 +61,11 @@ public class RentalRecord implements Serializable {
     @ManyToOne(optional = true)
     private Car car;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = true)
     private CarModel carModel;
+    
+    @ManyToOne(optional = true)
+    private CarCategory carCategory;
 
     public RentalRecord() {
         this.pickedUp = false;
@@ -86,6 +88,21 @@ public class RentalRecord implements Serializable {
         this.toOutlet = toOutlet;
         this.customer = customer;
         this.carModel = carModel;
+    }
+     public RentalRecord(Date startDateTime, Date endDateTime, String ccNum, BigDecimal amount, Boolean paid, Boolean pickedUp, Boolean returned, Boolean cancelled, Outlet fromOutlet, Outlet toOutlet, Customer customer, CarCategory category) {
+        this();
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.ccNum = ccNum;
+        this.amount = amount;
+        this.paid = paid;
+        this.pickedUp = pickedUp;
+        this.returned = returned;
+        this.cancelled = cancelled;
+        this.fromOutlet = fromOutlet;
+        this.toOutlet = toOutlet;
+        this.customer = customer;
+        this.carCategory = category;
     }
 
     public Long getRentalRecordId() {
@@ -329,6 +346,20 @@ public class RentalRecord implements Serializable {
      */
     public void setPenaltyAmount(BigDecimal penaltyAmount) {
         this.penaltyAmount = penaltyAmount;
+    }
+
+    /**
+     * @return the carCategory
+     */
+    public CarCategory getCarCategory() {
+        return carCategory;
+    }
+
+    /**
+     * @param carCategory the carCategory to set
+     */
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
     }
 
 }

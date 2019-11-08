@@ -221,7 +221,7 @@ public class OperationsModule {
                 if (result == 0) {
                     System.out.println("Car model ID " + modelId + " deleted");
                 } else if (result == 1) {
-                    System.out.println("Car entities exist. Car model ID " + modelId + " disabled instead");
+                    System.out.println("Car entities or rental records uisng car model exist. Car model ID " + modelId + " disabled instead");
                 }
             } catch (CarModelNotFoundException ex) {
                 System.out.println(ex.getMessage());

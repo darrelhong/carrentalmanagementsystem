@@ -111,8 +111,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         toDelete.getCarModel().getCars().remove(toDelete);
         toDelete.getCarCategory().getCars().remove(toDelete);
-        // To edit when RentalRecord is implemented
-        if (toDelete.getAvailabilityStatus()) {
+        if (toDelete.getAvailabilityStatus() && toDelete.getRentalRecords().isEmpty()) {
             em.remove(toDelete);
             return 0;
         } else {

@@ -1,5 +1,8 @@
 package ejb.session.stateful;
 
+import ejb.session.stateless.CarCategorySessionBeanLocal;
+import ejb.session.stateless.CarModelSessionBeanLocal;
+import ejb.session.stateless.OutletSessionBeanLocal;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Customer;
@@ -9,6 +12,7 @@ import entity.RentalRecord;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateful;
@@ -34,10 +38,20 @@ import util.exception.UnknownPersistenceException;
 @Remote(BookingSessionBeanRemote.class)
 public class BookingSessionBean implements BookingSessionBeanRemote, BookingSessionBeanLocal {
 
+    @EJB(name = "OutletSessionBeanLocal")
+    private OutletSessionBeanLocal outletSessionBeanLocal;
+
+    @EJB(name = "CarModelSessionBeanLocal")
+    private CarModelSessionBeanLocal carModelSessionBeanLocal;
+
+    @EJB(name = "CarCategorySessionBeanLocal")
+    private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
+
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
 
     CarModel bookingCarModel;
+    CarCategory bookingCarCatgory;
     Date bookingStartDate;
     Date bookingEndDate;
     Outlet bookingPickupOutlet;
@@ -47,49 +61,56 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
 
     public BookingSessionBean() {
     }
+    
+    public BigDecimal searchByCarCategory(Long categoryId, Date start, Date end, Long pickupOutletId, Long returnOutletId)
+            throws CarCategoryNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, OutletClosedException {
+        try {
+            bookingCarModel = null;
+            CarCategory category = carCategorySessionBeanLocal.retrieveCarCategoryById(categoryId);
+            bookingCarCatgory = category;
+            Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(pickupOutletId);
+            if (start.getHours() < pickupOutlet.getOpenTime()) {
+                throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " opens at " + String.format("%02d:00", pickupOutlet.getOpenTime()) + "H");
+            }
+            bookingPickupOutlet = pickupOutlet;
+            Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(returnOutletId);
+            if (end.getHours() > returnOutlet.getCloseTime()) {
+                throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " closes at " + String.format("%02d:00", pickupOutlet.getCloseTime()) + "H");
+            }
+            bookingReturnOutlet = returnOutlet;
 
-    @Override
-    public BigDecimal searchByCarModel(Long categoryId, Long modelId, Date start, Date end, Long pickupOutletId, Long returnOutletId)
-            throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, NoRateFoundException, OutletClosedException {
-        CarCategory cat = em.find(CarCategory.class, categoryId);
-        if (cat == null) {
-            throw new CarCategoryNotFoundException("Car category ID " + categoryId + " does not exist!");
-        }
-        CarModel model = em.find(CarModel.class, modelId);
-        if (model == null) {
-            throw new CarModelNotFoundException("Car mode ID " + modelId + " does not exist!");
-        }
-        bookingCarModel = model;
-        Outlet pickupOutlet = em.find(Outlet.class, pickupOutletId);
-        if (pickupOutlet == null) {
-            throw new OutletNotFoundException("Outlet ID " + pickupOutletId + " does not exist!");
-        }
-        if (start.getHours() < pickupOutlet.getOpenTime()) {
-            throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " opens at " + String.format("%02d:00", pickupOutlet.getOpenTime()) + "H");
-        }
-        bookingPickupOutlet = pickupOutlet;
-        Outlet returnOutlet = em.find(Outlet.class, returnOutletId);
-        if (returnOutlet == null) {
-            throw new OutletNotFoundException("Outlet ID " + returnOutletId + " does not exist!");
-        }
-        if (end.getHours() > returnOutlet.getCloseTime()) {
-            throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " closes at " + String.format("%02d:00", pickupOutlet.getCloseTime()) + "H");
-        }
-        bookingReturnOutlet = returnOutlet;
-        Query rrCountQuery = em.createQuery("SELECT COUNT(rr) FROM RentalRecord rr WHERE rr.carModel.carModelId = :modelId AND rr.startDateTime BETWEEN :start AND :end OR rr.endDateTime BETWEEN :start AND :end OR :start BETWEEN rr.startDateTime AND rr.endDateTime");
-        rrCountQuery.setParameter("modelId", modelId);
-        rrCountQuery.setParameter("start", start);
-        rrCountQuery.setParameter("end", end);
-        Long rrCount = (Long) rrCountQuery.getSingleResult();
-        System.out.println("rental record count " + rrCount);
+            Query qClashBookings = em.createQuery("SELECT COUNT(rr) FROM RentalRecord rr WHERE rr.carCategory.carCategoryId = :categoryId AND rr.cancelled = FALSE AND (rr.startDateTime BETWEEN :start AND :end OR rr.endDateTime BETWEEN :start AND :end OR :start BETWEEN rr.startDateTime AND rr.endDateTime)");
+            qClashBookings.setParameter("categoryId", categoryId);
+            qClashBookings.setParameter("start", start);
+            qClashBookings.setParameter("end", end);
+            Long numClashBookings = (Long) qClashBookings.getSingleResult();
+            System.out.println("numClashBookings " + numClashBookings);
 
-        Query modelCountAtOutletQuery = em.createQuery("SELECT COUNT(c) FROM Car c WHERE c.carModel.carModelId = :modelId AND c.disabled = FALSE AND c.outlet.outletId = :pickupOutletId");
-        modelCountAtOutletQuery.setParameter("modelId", modelId);
-        modelCountAtOutletQuery.setParameter("pickupOutletId", pickupOutletId);
-        Long modelCountAtOutlet = (Long) modelCountAtOutletQuery.getSingleResult();
+            Query qCategoryTotalCount = em.createQuery("SELECT COUNT(c) FROM Car c WHERE c.carCategory.carCategoryId = :categoryId AND c.disabled = FALSE");
+            qCategoryTotalCount.setParameter("categoryId", categoryId);
+            Long categoryTotalCount = (Long) qCategoryTotalCount.getSingleResult();
+            System.out.println("categoryTotalCount " + categoryTotalCount);
 
-        if (modelCountAtOutlet > rrCount) {
-            // enough inventory at outlet
+            Long currentAvail = categoryTotalCount - numClashBookings;
+            System.out.println("currentAvail() " + currentAvail);
+            if (currentAvail <= 0) {
+                throw new InsufficientInventoryException("Insufficient inventory for this category: " + category.getCarCategory());
+            }
+
+            Date twoHrsBeforeStart = new Date(start.getTime() - 3600 * 1000);
+            Query qClashBooking2HrsBefore = em.createQuery("SELECT COUNT(rr) FROM RentalRecord rr WHERE rr.carCategory.carCategoryId = :categoryId AND rr.endDateTime BETWEEN :twoHrsBefore AND :start AND rr.toOutlet.outletId <> :pickupOutletId");
+            qClashBooking2HrsBefore.setParameter("categoryId", categoryId);
+            qClashBooking2HrsBefore.setParameter("twoHrsBefore", twoHrsBeforeStart);
+            qClashBooking2HrsBefore.setParameter("start", start);
+            qClashBooking2HrsBefore.setParameter("pickupOutletId", pickupOutletId);
+            Long clashBooking2HrsBefore = (Long) qClashBooking2HrsBefore.getSingleResult();
+            System.out.println("clashBooking2HrsBefore " + clashBooking2HrsBefore);
+
+            currentAvail -= clashBooking2HrsBefore;
+            System.out.println("currentAvail(after check 2hrs) " + currentAvail);
+            if (currentAvail <= 0) {
+                throw new InsufficientInventoryException("Insufficient inventory for this category: " + category.getCarCategory());
+            }
             try {
                 totalRate = new BigDecimal(0);
                 calculateRate(start, end, categoryId);
@@ -97,35 +118,81 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
             } catch (NoRateFoundException ex) {
                 throw ex;
             }
-        } else {
-            // not enough inventory at outlet need to recheck rentalrecords
-            Date twoHrsBeforeStart = new Date(start.getTime() - 3600 * 1000);
-            Query rrCount2Query = em.createQuery("SELECT COUNT(rr) FROM RentalRecord rr WHERE rr.carModel.carModelId = :modelId AND rr.startDateTime BETWEEN :start AND :end OR rr.endDateTime BETWEEN :start AND :end OR :start BETWEEN rr.startDateTime AND rr.endDateTime");
-            rrCount2Query.setParameter("modelId", modelId);
-            rrCount2Query.setParameter("start", twoHrsBeforeStart);
-            rrCount2Query.setParameter("end", end);
-            Long rrCount2 = (Long) rrCount2Query.getSingleResult();
-            System.out.println(rrCount2);
 
-            Integer totalModelCount = em.find(CarModel.class, modelId).getCars().size();
-            System.out.println(totalModelCount);
-
-            if (totalModelCount > rrCount2) {
-                try {
-                    totalRate = new BigDecimal(0);
-                    calculateRate(start, end, categoryId);
-                    System.out.println("totalRate " + totalRate);
-                } catch (NoRateFoundException ex) {
-                    throw ex;
-                }
-                transferRequired = true;
-            } else {
-                throw new InsufficientInventoryException("Insufficient inventory for this model.");
-            }
+            bookingStartDate = start;
+            bookingEndDate = end;
+            return totalRate;
+        } catch (CarCategoryNotFoundException | OutletNotFoundException | OutletClosedException | InsufficientInventoryException | NoRateFoundException ex) {
+            throw ex;
         }
-        bookingStartDate = start;
-        bookingEndDate = end;
-        return totalRate;
+    }
+
+    @Override
+    public BigDecimal searchByCarModel(Long categoryId, Long modelId, Date start, Date end, Long pickupOutletId, Long returnOutletId)
+            throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, OutletClosedException {
+        try {
+            bookingCarCatgory = null;
+            CarCategory category = carCategorySessionBeanLocal.retrieveCarCategoryById(categoryId);
+            CarModel model = carModelSessionBeanLocal.retrieveCarModelById(modelId);
+            bookingCarModel = model;
+            Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(pickupOutletId);
+            if (start.getHours() < pickupOutlet.getOpenTime()) {
+                throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " opens at " + String.format("%02d:00", pickupOutlet.getOpenTime()) + "H");
+            }
+            bookingPickupOutlet = pickupOutlet;
+            Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(returnOutletId);
+            if (end.getHours() > returnOutlet.getCloseTime()) {
+                throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " closes at " + String.format("%02d:00", pickupOutlet.getCloseTime()) + "H");
+            }
+            bookingReturnOutlet = returnOutlet;
+
+            Query qClashBookings = em.createQuery("SELECT COUNT(rr) FROM RentalRecord rr WHERE rr.carModel.carModelId = :modelId AND rr.cancelled = FALSE AND (rr.startDateTime BETWEEN :start AND :end OR rr.endDateTime BETWEEN :start AND :end OR :start BETWEEN rr.startDateTime AND rr.endDateTime)");
+            qClashBookings.setParameter("modelId", modelId);
+            qClashBookings.setParameter("start", start);
+            qClashBookings.setParameter("end", end);
+            Long numClashBookings = (Long) qClashBookings.getSingleResult();
+            System.out.println("numClashBookings " + numClashBookings);
+
+            Query qModelTotalCount = em.createQuery("SELECT COUNT(c) FROM Car c WHERE c.carModel.carModelId = :modelId AND c.disabled = FALSE");
+            qModelTotalCount.setParameter("modelId", modelId);
+            Long modelTotalCount = (Long) qModelTotalCount.getSingleResult();
+            System.out.println("modelTotalCount" + modelTotalCount);
+
+            Long currentAvail = modelTotalCount - numClashBookings;
+            System.out.println("currentAvail()" + currentAvail);
+            if (currentAvail <= 0) {
+                throw new InsufficientInventoryException("Insufficient inventory for this model: " + model.getMake() + " " + model.getModel());
+            }
+            // Check for any rental record returning to another outlet 2hrs before
+            Date twoHrsBeforeStart = new Date(start.getTime() - 3600 * 1000);
+            Query qClashBooking2HrsBefore = em.createQuery("SELECT COUNT(rr) FROM RentalRecord rr WHERE rr.carModel.carModelId = :modelId AND rr.endDateTime BETWEEN :twoHrsBefore AND :start AND rr.toOutlet.outletId <> :pickupOutletId");
+            qClashBooking2HrsBefore.setParameter("modelId", modelId);
+            qClashBooking2HrsBefore.setParameter("twoHrsBefore", twoHrsBeforeStart);
+            qClashBooking2HrsBefore.setParameter("start", start);
+            qClashBooking2HrsBefore.setParameter("pickupOutletId", pickupOutletId);
+            Long clashBooking2HrsBefore = (Long) qClashBooking2HrsBefore.getSingleResult();
+            System.out.println("clashBooking2HrsBefore " + clashBooking2HrsBefore);
+
+            currentAvail -= clashBooking2HrsBefore;
+            System.out.println("currentAvail(after check 2hrs) " + currentAvail);
+            if (currentAvail <= 0) {
+                throw new InsufficientInventoryException("Insufficient inventory for this model: " + model.getMake() + " " + model.getModel());
+            }
+            try {
+                totalRate = new BigDecimal(0);
+                calculateRate(start, end, categoryId);
+                System.out.println("totalRate " + totalRate);
+            } catch (NoRateFoundException ex) {
+                throw ex;
+            }
+
+            bookingStartDate = start;
+            bookingEndDate = end;
+            return totalRate;
+
+        } catch (CarCategoryNotFoundException | CarModelNotFoundException | OutletNotFoundException | OutletClosedException | InsufficientInventoryException | NoRateFoundException ex) {
+            throw ex;
+        }
     }
 
     private void calculateRate(Date start, Date end, Long categoryId) throws NoRateFoundException {
@@ -160,6 +227,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
             }
         }
     }
+
     @Override
     public void confirmReservation(Customer customer, String ccNum, boolean immediatePayment) throws CustomerNotFoundException, UnknownPersistenceException {
         Customer cust = em.find(Customer.class, customer.getCustomerId());
@@ -181,7 +249,13 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         newRR.setToOutlet(bookingReturnOutlet);
         newRR.setCustomer(customer);
         cust.getRentalRecords().add(newRR);
-        newRR.setCarModel(bookingCarModel);
+        if (bookingCarModel != null) {
+            newRR.setCarModel(bookingCarModel);
+            bookingCarModel.getRentalRecords().add(newRR);
+        } 
+        if (bookingCarCatgory != null) {
+            newRR.setCarCategory(bookingCarCatgory);
+        }
     }
 
     // For data init
@@ -189,16 +263,12 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
     public void createTestRentalRecord(RentalRecord rentalRecord) throws UnknownPersistenceException {
         try {
             em.persist(rentalRecord);
+            if (rentalRecord.getCarModel() != null) {
+                rentalRecord.getCarModel().getRentalRecords().add(rentalRecord);
+            }
             em.flush();
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException(ex.getMessage());
         }
     }
-
-    @Override
-    public List searchByCarCategory(Long categoryId, Date start, Date end, Long pickupOutletId, Long returnOutletId) throws CarCategoryNotFoundException, InsufficientInventoryException, NoRateFoundException {
-        return null;
-    }
-
-
 }

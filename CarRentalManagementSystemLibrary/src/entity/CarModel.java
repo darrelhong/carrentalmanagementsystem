@@ -36,9 +36,13 @@ public class CarModel implements Serializable {
     
     @OneToMany(mappedBy = "carModel")
     private List<Car> cars;
+    
+    @OneToMany(mappedBy = "carModel")
+    private List<RentalRecord> rentalRecords;
 
     public CarModel() {
         this.cars = new ArrayList<>();
+        this.rentalRecords = new ArrayList<>();
         this.disabled = false;
     }
 
@@ -150,6 +154,20 @@ public class CarModel implements Serializable {
      */
     public void setCars(List<Car> cars) {
         this.cars = cars;
+    }
+
+    /**
+     * @return the rentalRecords
+     */
+    public List<RentalRecord> getRentalRecords() {
+        return rentalRecords;
+    }
+
+    /**
+     * @param rentalRecords the rentalRecords to set
+     */
+    public void setRentalRecords(List<RentalRecord> rentalRecords) {
+        this.rentalRecords = rentalRecords;
     }
 
 }

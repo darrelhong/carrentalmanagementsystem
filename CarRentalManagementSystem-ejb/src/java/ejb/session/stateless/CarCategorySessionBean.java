@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -41,5 +42,15 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
     public List retrieveAllCarCategories() {
         Query query = em.createQuery("SELECT c from CarCategory c ORDER BY c.carCategoryId");
         return query.getResultList();
+    }
+
+    @Override
+    public CarCategory retrieveCarCategoryById(Long categoryId) throws CarCategoryNotFoundException {
+        CarCategory result = em.find(CarCategory.class, categoryId);
+        if (result != null) {
+            return result;
+        } else {
+            throw new CarCategoryNotFoundException("Car category with ID: " + categoryId + " does not exist!");
+        }
     }
 }

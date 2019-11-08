@@ -193,9 +193,9 @@ public class MainApp {
         }
         while (true) {
             try {
-                System.out.print("Enter start date and time (dd/mm/yyyy hh:mm AM/PM)> ");
+                System.out.print("Enter pickup date and time (dd/mm/yyyy hh:mm AM/PM)> ");
                 start = inputDateFormat.parse(sc.nextLine().trim());
-                System.out.print("Enter Return Date (dd/mm/yyyy hh:mm AM/PM)> ");
+                System.out.print("Enter return date and time (dd/mm/yyyy hh:mm AM/PM)> ");
                 end = inputDateFormat.parse(sc.nextLine().trim());
                 break;
             } catch (ParseException ex) {
@@ -210,8 +210,8 @@ public class MainApp {
         returnOutletId = Long.parseLong(sc.nextLine().trim());
         if (modelId != 0) {
             try {
-                BigDecimal rate = bookingSessionBeanRemote.searchByCarModel(categoryId, modelId, start, end, pickupOutletId, returnOutletId);
-                System.out.print("Car model available! Total rate: S$" + rate + ". Confirm booking? (Press 'Y' to confirm)> ");
+                BigDecimal finalRate = bookingSessionBeanRemote.searchByCarModel(categoryId, modelId, start, end, pickupOutletId, returnOutletId);
+                System.out.print("Car model available! Total rate: S$" + finalRate + ". Confirm booking? (Press 'Y' to confirm)> ");
                 response = sc.nextLine().trim();
                 if (response.toLowerCase().equals("y")) {
                     if (currentCustomer != null) {
@@ -227,7 +227,22 @@ public class MainApp {
                 System.out.println("\n" + ex.getMessage());
             }
         } else {
-//            bookingSessionBeanRemote.searchByCarCategory(categoryId, start, end, pickupOutletId, returnOutletId);
+            try {
+                BigDecimal finalRate = bookingSessionBeanRemote.searchByCarCategory(categoryId, start, end, pickupOutletId, returnOutletId);
+                System.out.print("Car available! Total rate: S$" + finalRate + ". Confirm booking? (Press 'Y' to confirm)> ");
+                response = sc.nextLine().trim();
+                if (response.toLowerCase().equals("y")) {
+                    if (currentCustomer != null) {
+                        doReserveCar();
+                    } else {
+                        System.out.println("Please log in to make reservation.");
+                    }
+                } else {
+                    System.out.println("Reservation cancelled");
+                }
+            } catch (CarCategoryNotFoundException | OutletNotFoundException | NoRateFoundException | InsufficientInventoryException | OutletClosedException ex) {
+                System.out.println("\n" + ex.getMessage());
+            }
         }
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();

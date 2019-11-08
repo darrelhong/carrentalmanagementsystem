@@ -18,8 +18,8 @@ public interface BookingSessionBeanRemote {
 
     BigDecimal searchByCarModel(Long categoryId, Long modelId, Date start, Date end, Long pickupOutletId, Long returnOutletId) throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, OutletClosedException;
 
-    List searchByCarCategory(Long categoryId, Date start, Date end, Long pickupOutletId, Long returnOutletId) throws CarCategoryNotFoundException, InsufficientInventoryException, NoRateFoundException;
-
     void confirmReservation(Customer customer, String ccNum, boolean immediatePayment) throws CustomerNotFoundException, UnknownPersistenceException;
+
+    public BigDecimal searchByCarCategory(Long categoryId, Date start, Date end, Long pickupOutletId, Long returnOutletId) throws CarCategoryNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, OutletClosedException;
     
 }
