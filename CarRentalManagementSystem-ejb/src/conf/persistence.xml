@@ -10,6 +10,7 @@
     <class>entity.RentalRate</class>
     <class>entity.Customer</class>
     <class>entity.RentalRecord</class>
+    <class>entity.TransitDispatchRecord</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

@@ -115,6 +115,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             em.remove(toDelete);
             return 0;
         } else {
+            toDelete.setAvailabilityStatus(false);
             toDelete.setDisabled(true);
             return 1;
         }

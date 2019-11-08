@@ -6,6 +6,7 @@ import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.RentalRecordSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightsException;
@@ -23,6 +24,7 @@ public class MainApp {
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private RentalRecordSessionBeanRemote rentalRecordSessionBeanRemote;
 
     private OperationsModule operationsModule;
     private CustomerServiceModule customerServiceModule;
@@ -35,13 +37,15 @@ public class MainApp {
 
     public MainApp(EmployeeSessionBeanRemote esbr, CarModelSessionBeanRemote cmsbr,
             CarSessionBeanRemote csbr, CarCategorySessionBeanRemote ccsbr,
-            OutletSessionBeanRemote osbr, RentalRateSessionBeanRemote rrsbr) {
+            OutletSessionBeanRemote osbr, RentalRateSessionBeanRemote rrsbr,
+            RentalRecordSessionBeanRemote rrsbr1) {
         this.employeeSessionBeanRemote = esbr;
         this.carModelSessionBeanRemote = cmsbr;
         this.carSessionBeanRemote = csbr;
         this.carCategorySessionBeanRemote = ccsbr;
         this.outletSessionBeanRemote = osbr;
         this.rentalRateSessionBeanRemote = rrsbr;
+        this.rentalRecordSessionBeanRemote = rrsbr1;
     }
 
     public void runApp() {
@@ -65,8 +69,9 @@ public class MainApp {
 
                         operationsModule = new OperationsModule(currentEmployee,
                                 carModelSessionBeanRemote, carSessionBeanRemote,
-                                carCategorySessionBeanRemote, outletSessionBeanRemote);
-                        customerServiceModule = new CustomerServiceModule(currentEmployee);
+                                carCategorySessionBeanRemote, outletSessionBeanRemote, rentalRecordSessionBeanRemote,
+                                employeeSessionBeanRemote);
+                        customerServiceModule = new CustomerServiceModule(currentEmployee, rentalRecordSessionBeanRemote);
                         salesModule = new SalesModule(currentEmployee, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialsException ex) {

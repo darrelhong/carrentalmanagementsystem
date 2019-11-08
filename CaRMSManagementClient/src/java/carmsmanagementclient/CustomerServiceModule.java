@@ -1,9 +1,14 @@
 package carmsmanagementclient;
 
+import ejb.session.stateless.RentalRecordSessionBeanRemote;
 import entity.Employee;
+import entity.RentalRecord;
 import java.util.Scanner;
 import util.enumeration.EmployeeType;
+import util.exception.CarNotAssignedException;
 import util.exception.InvalidAccessRightsException;
+import util.exception.RentalRecordNotFoundException;
+import util.helper.Print;
 
 /**
  *
@@ -11,13 +16,16 @@ import util.exception.InvalidAccessRightsException;
  */
 public class CustomerServiceModule {
 
+    private RentalRecordSessionBeanRemote rentalRecordSessionBeanRemote;
+
     private Employee currentEmployee;
 
     public CustomerServiceModule() {
     }
 
-    public CustomerServiceModule(Employee currentEmployee) {
+    public CustomerServiceModule(Employee currentEmployee, RentalRecordSessionBeanRemote rrsbr) {
         this.currentEmployee = currentEmployee;
+        this.rentalRecordSessionBeanRemote = rrsbr;
     }
 
     public void menuCustomerService() throws InvalidAccessRightsException {
@@ -59,7 +67,18 @@ public class CustomerServiceModule {
     private void doPickupCar() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Customer Service Menu :: Pickup Car ***\n");
-        System.out.println("Unsupported action");
+
+        System.out.print("Enter booking ID> ");
+        Long rentalRecordId = Long.parseLong(sc.nextLine().trim());
+
+        try {
+            RentalRecord result = rentalRecordSessionBeanRemote.pickupCar(rentalRecordId);
+            System.out.println("Successful pickup!");
+            Print.printRentalRecord(result);
+        } catch (CarNotAssignedException | RentalRecordNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
@@ -67,7 +86,18 @@ public class CustomerServiceModule {
     private void doReturnCar() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Customer Service Menu :: Return Car ***\n");
-        System.out.println("Unsupported action");
+
+        System.out.print("Enter booking ID> ");
+        Long rentalRecordId = Long.parseLong(sc.nextLine().trim());
+        
+        try {
+            RentalRecord result = rentalRecordSessionBeanRemote.returnCar(rentalRecordId);
+            System.out.println("Successful return!");
+            Print.printRentalRecord(result);
+        } catch (RentalRecordNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }  
+
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }

@@ -3,9 +3,11 @@ package util.helper;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
+import entity.Employee;
 import entity.Outlet;
 import entity.RentalRate;
 import entity.RentalRecord;
+import entity.TransitDispatchRecord;
 import java.util.List;
 
 /**
@@ -14,10 +16,41 @@ import java.util.List;
  */
 public class Print {
 
+    public static void printListEmployees(List<Employee> employees) {
+        System.out.printf("%11s%20s%11s%20s\n", "Employee ID", "Name", "Role", "Outlet");
+        employees.forEach((e) -> {
+            System.out.printf("%11s%20s%11s%20s\n", e.getEmployeeId(), e.getName(), e.getEmployeeType(), e.getOutlet().getAddress());
+        });
+    }
+
+    public static void printEmployee(Employee e) {
+        System.out.printf("%11s%20s%11s%20s\n", "Employee ID", "Name", "Role", "Outlet");
+        System.out.printf("%11s%20s%11s%20s\n", e.getEmployeeId(), e.getName(), e.getEmployeeType(), e.getOutlet().getAddress());
+    }
+
+    public static void printListTDR(List<TransitDispatchRecord> tdrs) {
+        System.out.printf("%6s%20s%20s%15s%20s%10s\n", "TDR ID", "From Outlet", "To Outlet", "Car Id", "Assigned Employee", "Completed");
+        tdrs.forEach((tdr) -> {
+            String employee = tdr.getEmployee() != null ? tdr.getEmployee().getName() : "not assigned";
+            String carPlate = tdr.getRentalRecord().getCar() != null ? tdr.getRentalRecord().getCar().getLicensePlate() : "not allocated";
+            System.out.printf("%6s%20s%20s%15s%20s%10s\n", tdr.getId(), tdr.getFromOutlet().getAddress(), tdr.getRentalRecord().getFromOutlet().getAddress(), carPlate, employee, tdr.getCompleted());
+        });
+    }
+
+    public static void printTDR(TransitDispatchRecord tdr) {
+        System.out.printf("%6s%20s%20s%15s%20s%10s\n", "TDR ID", "From Outlet", "To Outlet", "Car Id", "Assigned Employee", "Completed");
+        String employee = tdr.getEmployee() != null ? tdr.getEmployee().getName() : "not assigned";
+        String carPlate = tdr.getRentalRecord().getCar() != null ? tdr.getRentalRecord().getCar().getLicensePlate() : "not allocated";
+        System.out.printf("%6s%20s%20s%15s%20s%10s\n", tdr.getId(), tdr.getFromOutlet().getAddress(), tdr.getRentalRecord().getFromOutlet().getAddress(), carPlate, employee, tdr.getCompleted());
+    }
+
     public static void printListRentalRecords(List<RentalRecord> records) {
-        System.out.printf("%10s%9s%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", "Booking ID", "Amount", "Make", "Model", "Start", "End", "From", "To", "Paid", "PickedUp", "Returned", "Cancelled");
+        System.out.printf("%10s%9s%20s%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", "Booking ID", "Amount", "Category", "Make", "Model", "Start", "End", "From", "To", "Paid", "PickedUp", "Returned", "Cancelled");
         records.forEach((r) -> {
-            System.out.printf("%10s%9.2f%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", r.getRentalRecordId(), r.getAmount(), r.getCarModel().getMake(), r.getCarModel().getModel(), r.getStartDateTime(), r.getEndDateTime(), r.getFromOutlet().getAddress(), r.getToOutlet().getAddress(), r.getPaid(), r.getPickedUp(), r.getReturned(), r.getCancelled());
+            String make = r.getCarModel() != null ? r.getCarModel().getMake() : "";
+            String model = r.getCarModel() != null ? r.getCarModel().getModel() : "";
+            String category = r.getCarCategory() != null ? r.getCarCategory().getCarCategory() : r.getCarModel().getCarCategory().getCarCategory();
+            System.out.printf("%10s%9.2f%20s%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", r.getRentalRecordId(), r.getAmount(), category, make, model, r.getStartDateTime(), r.getEndDateTime(), r.getFromOutlet().getAddress(), r.getToOutlet().getAddress(), r.getPaid(), r.getPickedUp(), r.getReturned(), r.getCancelled());
         });
     }
 

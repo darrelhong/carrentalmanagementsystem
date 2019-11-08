@@ -3,21 +3,27 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RentalRecordSessionBeanRemote;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
+import entity.TransitDispatchRecord;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeType;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
+import util.exception.EmployeeNotFoundException;
 import util.exception.EntityDisabledException;
 import util.exception.InvalidAccessRightsException;
 import util.exception.OutletNotFoundException;
+import util.exception.TransitDispatchRecordNotFoundException;
+import util.exception.TransitNotAssignedException;
 import util.exception.UnknownPersistenceException;
 import util.helper.Print;
 
@@ -31,6 +37,8 @@ public class OperationsModule {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private RentalRecordSessionBeanRemote rentalRecordSessionBeanRemote;
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
 
     private Employee currentEmployee;
 
@@ -39,12 +47,15 @@ public class OperationsModule {
 
     public OperationsModule(Employee currentEmployee, CarModelSessionBeanRemote cmsbr,
             CarSessionBeanRemote csbr, CarCategorySessionBeanRemote ccsbr,
-            OutletSessionBeanRemote osbr) {
+            OutletSessionBeanRemote osbr, RentalRecordSessionBeanRemote rrsbr,
+            EmployeeSessionBeanRemote esbr) {
         this.currentEmployee = currentEmployee;
         this.carModelSessionBeanRemote = cmsbr;
         this.carSessionBeanRemote = csbr;
         this.carCategorySessionBeanRemote = ccsbr;
         this.outletSessionBeanRemote = osbr;
+        this.rentalRecordSessionBeanRemote = rrsbr;
+        this.employeeSessionBeanRemote = esbr;
     }
 
     public void menuOperations() throws InvalidAccessRightsException {
@@ -411,7 +422,10 @@ public class OperationsModule {
     private void doViewTodayTransitRecords() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Operations Menu :: View Today's Transit Records ***\n");
-        System.out.println("Unsupported action");
+
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee);
+        Print.printListTDR(tdrs);
+
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
@@ -419,7 +433,27 @@ public class OperationsModule {
     private void doAssignTransitDriver() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Operations Menu :: Assign Transit Driver ***\n");
-        System.out.println("Unsupported action");
+
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee);
+        Print.printListTDR(tdrs);
+
+        System.out.print("Enter TDR ID> ");
+        Long tdrId = Long.parseLong(sc.nextLine().trim());
+
+        List<Employee> outletEmployees = employeeSessionBeanRemote.retrieveAllEmployeesByOutlet(currentEmployee.getOutlet().getOutletId());
+        Print.printListEmployees(outletEmployees);
+
+        System.out.print("\nEnter employee ID to assign> ");
+        Long employeeId = Long.parseLong(sc.nextLine().trim());
+
+        try {
+            TransitDispatchRecord result = rentalRecordSessionBeanRemote.assignEmployeeToTDR(tdrId, employeeId);
+            System.out.println("Assignment success!");
+            Print.printTDR(result);
+        } catch (EmployeeNotFoundException | TransitDispatchRecordNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
@@ -427,7 +461,21 @@ public class OperationsModule {
     private void doUpdateTransitAsCompleted() {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Operations Menu :: Update Transit as Completed ***\n");
-        System.out.println("Unsupported action");
+
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee);
+        Print.printListTDR(tdrs);
+        
+        System.out.print("Enter TDR ID to mark as completed> ");
+        Long tdrId = Long.parseLong(sc.nextLine().trim());
+        
+        try {
+            TransitDispatchRecord result = rentalRecordSessionBeanRemote.markTransitAsCompleted(tdrId);
+            System.out.println("Transit updated as completed!");
+            Print.printTDR(result);
+        } catch (TransitDispatchRecordNotFoundException | TransitNotAssignedException ex) {
+            System.out.println(ex.getMessage());
+        }
+
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
