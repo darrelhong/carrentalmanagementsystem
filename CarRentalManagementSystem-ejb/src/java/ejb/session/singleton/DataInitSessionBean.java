@@ -7,6 +7,7 @@ import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
+import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
 import ejb.session.stateless.RentalRecordSessionBeanLocal;
 import entity.Car;
@@ -15,6 +16,7 @@ import entity.CarModel;
 import entity.Customer;
 import entity.Employee;
 import entity.Outlet;
+import entity.Partner;
 import entity.RentalRate;
 import entity.RentalRecord;
 import java.math.BigDecimal;
@@ -27,6 +29,7 @@ import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.enumeration.EmployeeType;
+import util.enumeration.PartnerType;
 import util.exception.EmployeeNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -38,6 +41,9 @@ import util.exception.UnknownPersistenceException;
 @LocalBean
 @Startup
 public class DataInitSessionBean {
+
+    @EJB(name = "PartnerSessionBeanLocal")
+    private PartnerSessionBeanLocal partnerSessionBeanLocal;
 
     @EJB(name = "RentalRecordSessionBeanLocal")
     private RentalRecordSessionBeanLocal rentalRecordSessionBeanLocal;
@@ -103,6 +109,12 @@ public class DataInitSessionBean {
             outlet2.getEmployees().add(custSvc2);
             outlet2 = outletSessionBeanLocal.createNewOutletWithEmployees(outlet2);
 
+            Partner partnerManager = new Partner("Default Partner Manager", "partner", "password", PartnerType.MANAGER);
+            Partner partnerEmployee = new Partner("Default Partner Employee", "employee", "password", PartnerType.EMPLOYEE);
+            partnerManager = partnerSessionBeanLocal.createNewPartner(partnerManager);
+            partnerEmployee = partnerSessionBeanLocal.createNewPartner(partnerEmployee);
+            
+            
             CarCategory luxurySedan = new CarCategory("Luxury Sedan");
             CarCategory familySedan = new CarCategory("Family Sedan");
             CarCategory standardSedan = new CarCategory("Standard Sedan");

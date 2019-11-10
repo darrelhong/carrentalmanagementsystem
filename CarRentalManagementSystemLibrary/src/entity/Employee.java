@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.xml.bind.annotation.XmlTransient;
 import util.enumeration.EmployeeType;
 
 /**
@@ -138,6 +139,7 @@ public class Employee implements Serializable {
     /**
      * @return the outlet
      */
+    @XmlTransient
     public Outlet getOutlet() {
         return outlet;
     }

@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import util.exception.CancellationErrorException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CustomerNotFoundException;
@@ -359,10 +360,10 @@ public class MainApp {
             if (record.getCancelled()) {
                 System.out.println("Booking already cancelled");
             } else {
-                if (record.getStartDateTime().after(new Date())) {
-                    System.out.println("Cannot cancel after rental period has started!");
-                } else {
-                    System.out.println(rentalRecordSessionBeanRemote.cancelReservation(record));
+                try {
+                    System.out.println(rentalRecordSessionBeanRemote.cancelReservation(record.getRentalRecordId()));
+                } catch (CancellationErrorException ex) {
+                    System.out.println(ex.getMessage());
                 }
             }
         }

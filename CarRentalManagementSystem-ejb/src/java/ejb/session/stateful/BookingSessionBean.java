@@ -6,7 +6,9 @@ import ejb.session.stateless.OutletSessionBeanLocal;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Customer;
+import entity.ExternalCustomer;
 import entity.Outlet;
+import entity.Partner;
 import entity.RentalRate;
 import entity.RentalRecord;
 import java.math.BigDecimal;
@@ -62,6 +64,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
     public BookingSessionBean() {
     }
 
+    @Override
     public BigDecimal searchByCarCategory(Long categoryId, Date start, Date end, Long pickupOutletId, Long returnOutletId)
             throws CarCategoryNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, OutletClosedException {
         bookingCarModel = null;
@@ -221,24 +224,61 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         RentalRecord newRR = new RentalRecord();
         try {
             em.persist(newRR);
+            newRR.setStartDateTime(bookingStartDate);
+            newRR.setEndDateTime(bookingEndDate);
+            newRR.setCcNum(ccNum);
+            newRR.setAmount(totalRate);
+            newRR.setPaid(immediatePayment);
+            newRR.setFromOutlet(bookingPickupOutlet);
+            newRR.setToOutlet(bookingReturnOutlet);
+            newRR.setCustomer(customer);
+            cust.getRentalRecords().add(newRR);
+            if (bookingCarModel != null) {
+                newRR.setCarModel(bookingCarModel);
+                bookingCarModel.getRentalRecords().add(newRR);
+            }
+            if (bookingCarCatgory != null) {
+                newRR.setCarCategory(bookingCarCatgory);
+            }
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException(ex.getMessage());
         }
-        newRR.setStartDateTime(bookingStartDate);
-        newRR.setEndDateTime(bookingEndDate);
-        newRR.setCcNum(ccNum);
-        newRR.setAmount(totalRate);
-        newRR.setPaid(immediatePayment);
-        newRR.setFromOutlet(bookingPickupOutlet);
-        newRR.setToOutlet(bookingReturnOutlet);
-        newRR.setCustomer(customer);
-        cust.getRentalRecords().add(newRR);
-        if (bookingCarModel != null) {
-            newRR.setCarModel(bookingCarModel);
-            bookingCarModel.getRentalRecords().add(newRR);
-        }
-        if (bookingCarCatgory != null) {
-            newRR.setCarCategory(bookingCarCatgory);
+    }
+
+    @Override
+    public void confirmReservation(Long partnerId, String ccNum, Boolean immediatePayment, Long categoryId,
+            Long modelId, Date start, Date end, Long pickupOutletId, Long returnOutletId, BigDecimal totalRate,
+            String externalCustName) throws UnknownPersistenceException {
+        RentalRecord rr = new RentalRecord();
+        Partner partner = em.find(Partner.class, partnerId);
+        Outlet pickupOutlet = em.find(Outlet.class, pickupOutletId);
+        Outlet returnOutlet = em.find(Outlet.class, returnOutletId);
+        CarCategory carCategory;
+        CarModel carModel;
+        ExternalCustomer externalCustomer = new ExternalCustomer(externalCustName);
+        try {
+            em.persist(rr);
+            em.persist(externalCustomer);
+            rr.setStartDateTime(start);
+            rr.setEndDateTime(end);
+            rr.setCcNum(ccNum);
+            rr.setAmount(totalRate);
+            rr.setPaid(immediatePayment);
+            rr.setFromOutlet(pickupOutlet);
+            rr.setToOutlet(returnOutlet);
+            rr.setPartner(partner);
+            partner.getRentalRecords().add(rr);
+            if (modelId == 0) {
+                carCategory = em.find(CarCategory.class, categoryId);
+                rr.setCarCategory(carCategory);
+            } else {
+                carModel = em.find(CarModel.class, modelId);
+                rr.setCarModel(carModel);
+                carModel.getRentalRecords().add(rr);
+            }
+            rr.setExternalCustomer(externalCustomer);
+        } catch (PersistenceException ex) {
+            throw new UnknownPersistenceException(ex.getMessage());
         }
     }
 

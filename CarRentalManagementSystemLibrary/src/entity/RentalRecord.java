@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -50,20 +51,29 @@ public class RentalRecord implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet fromOutlet;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet toOutlet;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(nullable = true)
     private Customer customer;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(nullable = true)
+    private ExternalCustomer externalCustomer;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(nullable = true)
+    private Partner partner;
 
     @ManyToOne(optional = true)
     private Car car;
 
     @ManyToOne(optional = true)
     private CarModel carModel;
-    
+
     @ManyToOne(optional = true)
     private CarCategory carCategory;
 
@@ -89,7 +99,8 @@ public class RentalRecord implements Serializable {
         this.customer = customer;
         this.carModel = carModel;
     }
-     public RentalRecord(Date startDateTime, Date endDateTime, String ccNum, BigDecimal amount, Boolean paid, Boolean pickedUp, Boolean returned, Boolean cancelled, Outlet fromOutlet, Outlet toOutlet, Customer customer, CarCategory category) {
+
+    public RentalRecord(Date startDateTime, Date endDateTime, String ccNum, BigDecimal amount, Boolean paid, Boolean pickedUp, Boolean returned, Boolean cancelled, Outlet fromOutlet, Outlet toOutlet, Customer customer, CarCategory category) {
         this();
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
@@ -360,6 +371,34 @@ public class RentalRecord implements Serializable {
      */
     public void setCarCategory(CarCategory carCategory) {
         this.carCategory = carCategory;
+    }
+
+    /**
+     * @return the partner
+     */
+    public Partner getPartner() {
+        return partner;
+    }
+
+    /**
+     * @param partner the partner to set
+     */
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
+
+    /**
+     * @return the externalCustomer
+     */
+    public ExternalCustomer getExternalCustomer() {
+        return externalCustomer;
+    }
+
+    /**
+     * @param externalCustomer the externalCustomer to set
+     */
+    public void setExternalCustomer(ExternalCustomer externalCustomer) {
+        this.externalCustomer = externalCustomer;
     }
 
 }

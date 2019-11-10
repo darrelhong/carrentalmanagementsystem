@@ -6,6 +6,7 @@ import entity.CarModel;
 import entity.Customer;
 import entity.Employee;
 import entity.Outlet;
+import entity.Partner;
 import entity.RentalRecord;
 import entity.TransitDispatchRecord;
 import java.math.BigDecimal;
@@ -20,9 +21,11 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CancellationErrorException;
 import util.exception.CarNotAssignedException;
 import util.exception.CustomerNotFoundException;
 import util.exception.EmployeeNotFoundException;
+import util.exception.PartnerNotFoundException;
 import util.exception.RentalRecordNotFoundException;
 import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.TransitNotAssignedException;
@@ -36,6 +39,9 @@ import util.helper.Print;
 @Local(RentalRecordSessionBeanLocal.class)
 @Remote(RentalRecordSessionBeanRemote.class)
 public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, RentalRecordSessionBeanLocal {
+
+    @EJB(name = "PartnerSessionBeanLocal")
+    private PartnerSessionBeanLocal partnerSessionBeanLocal;
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -67,13 +73,17 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
     }
 
     @Override
-    public String cancelReservation(RentalRecord record) {
-        RentalRecord toCancel = em.find(RentalRecord.class, record.getRentalRecordId());
+    public String cancelReservation(Long recordId) throws CancellationErrorException {
+        RentalRecord toCancel = em.find(RentalRecord.class, recordId);
 
+        if (toCancel.getStartDateTime().before(new Date())) {
+            throw new CancellationErrorException("Cannot cancel after rental period has started!");
+        }
+        
         BigDecimal penalty = calculatePenalty(toCancel);
         toCancel.setPenaltyAmount(penalty);
         toCancel.setCancelled(true);
-        if (record.getPaid()) {
+        if (toCancel.getPaid()) {
             BigDecimal refundAmount = toCancel.getAmount().subtract(penalty);
             System.out.println(refundAmount);
             toCancel.setAmountToRefund(refundAmount);
@@ -291,5 +301,12 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
             destination.getCars().add(car);
         }
         return rr;
+    }
+
+    @Override
+    public List retrieveAllPartnerReservations(java.lang.String partnerId) throws PartnerNotFoundException {
+        Partner partner = partnerSessionBeanLocal.retrievePartnerByUsername(partnerId);
+        partner.getRentalRecords().size();
+        return partner.getRentalRecords();
     }
 }

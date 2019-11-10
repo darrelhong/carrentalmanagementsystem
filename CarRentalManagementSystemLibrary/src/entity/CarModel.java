@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -29,14 +30,14 @@ public class CarModel implements Serializable {
     private String model;
     @Column(nullable = false)
     private Boolean disabled;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
-    
+
     @OneToMany(mappedBy = "carModel")
     private List<Car> cars;
-    
+
     @OneToMany(mappedBy = "carModel")
     private List<RentalRecord> rentalRecords;
 
@@ -52,7 +53,6 @@ public class CarModel implements Serializable {
         this.model = model;
     }
 
-    
     public Long getCarModelId() {
         return carModelId;
     }
@@ -145,6 +145,7 @@ public class CarModel implements Serializable {
     /**
      * @return the cars
      */
+    @XmlTransient
     public List<Car> getCars() {
         return cars;
     }
@@ -159,6 +160,7 @@ public class CarModel implements Serializable {
     /**
      * @return the rentalRecords
      */
+    @XmlTransient
     public List<RentalRecord> getRentalRecords() {
         return rentalRecords;
     }

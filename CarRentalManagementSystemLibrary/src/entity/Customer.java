@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -121,6 +122,7 @@ public class Customer implements Serializable {
     /**
      * @return the rentalRecords
      */
+    @XmlTransient
     public List<RentalRecord> getRentalRecords() {
         return rentalRecords;
     }

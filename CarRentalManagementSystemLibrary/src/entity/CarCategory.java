@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -23,16 +24,16 @@ public class CarCategory implements Serializable {
     private Long carCategoryId;
     @Column(length = 32, nullable = false, unique = true)
     private String carCategory;
-    
+
     @OneToMany(mappedBy = "carCategory")
     private List<CarModel> carModels;
-    
+
     @OneToMany(mappedBy = "carCategory")
     private List<Car> cars;
 
     @OneToMany(mappedBy = "carCategory", orphanRemoval = true)
     private List<RentalRate> rentalRates;
-    
+
     public CarCategory() {
         this.cars = new ArrayList<>();
         this.carModels = new ArrayList<>();
@@ -94,6 +95,7 @@ public class CarCategory implements Serializable {
     /**
      * @return the carModels
      */
+    @XmlTransient
     public List<CarModel> getCarModels() {
         return carModels;
     }
@@ -108,6 +110,7 @@ public class CarCategory implements Serializable {
     /**
      * @return the cars
      */
+    @XmlTransient
     public List<Car> getCars() {
         return cars;
     }
@@ -122,6 +125,7 @@ public class CarCategory implements Serializable {
     /**
      * @return the rentalRates
      */
+    @XmlTransient
     public List<RentalRate> getRentalRates() {
         return rentalRates;
     }
@@ -132,5 +136,5 @@ public class CarCategory implements Serializable {
     public void setRentalRates(List<RentalRate> rentalRates) {
         this.rentalRates = rentalRates;
     }
-    
+
 }
