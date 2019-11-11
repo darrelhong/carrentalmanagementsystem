@@ -9,6 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -22,11 +25,20 @@ public class Outlet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
+    
     @Column(length = 128, nullable = false, unique = true)
+    @NotNull
+    @Size(min = 1, max = 128)
     private String address;
+    
     @Column(nullable = false)
+    @NotNull
+    @Min(0)
     private Integer openTime;
+    
     @Column(nullable = false)
+    @NotNull
+    @Min(0)
     private Integer closeTime;
 
     @OneToMany(mappedBy = "outlet")

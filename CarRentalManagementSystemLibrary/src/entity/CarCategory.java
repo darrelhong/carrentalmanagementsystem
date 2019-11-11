@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -22,7 +24,10 @@ public class CarCategory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carCategoryId;
+    
     @Column(length = 32, nullable = false, unique = true)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String carCategory;
 
     @OneToMany(mappedBy = "carCategory")

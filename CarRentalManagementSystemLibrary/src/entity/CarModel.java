@@ -29,12 +29,12 @@ public class CarModel implements Serializable {
     
     @Column(length = 32, nullable = false)
     @NotNull
-    @Size(max = 32)
+    @Size(min = 1, max = 32)
     private String make;
     
     @Column(length = 32, nullable = false)
     @NotNull
-    @Size(max = 32)
+    @Size(min = 1, max = 32)
     private String model;
     
     @Column(nullable = false)

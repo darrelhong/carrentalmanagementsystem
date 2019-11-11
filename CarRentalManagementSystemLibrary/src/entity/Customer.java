@@ -27,17 +27,17 @@ public class Customer implements Serializable {
     
     @Column(length = 32, nullable = false)
     @NotNull
-    @Size(max = 32)
+    @Size(min = 1, max = 32)
     private String name;
     
     @Column(length = 64, nullable = false, unique = true)
     @NotNull
-    @Size(max = 64)
+    @Size(min = 1, max = 64)
     private String email;
     
     @Column(length = 64, nullable = false)
     @NotNull
-    @Size(max = 64)
+    @Size(min = 1, max = 64)
     private String password;
     
     @OneToMany(mappedBy = "customer")
