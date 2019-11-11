@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -22,11 +24,20 @@ public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
+    
     @Column(length = 32, nullable = false)
+    @NotNull
+    @Size(max = 32)
     private String name;
+    
     @Column(length = 64, nullable = false, unique = true)
+    @NotNull
+    @Size(max = 64)
     private String email;
+    
     @Column(length = 64, nullable = false)
+    @NotNull
+    @Size(max = 64)
     private String password;
     
     @OneToMany(mappedBy = "customer")
