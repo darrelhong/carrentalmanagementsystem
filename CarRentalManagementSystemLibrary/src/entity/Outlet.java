@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -30,7 +31,7 @@ public class Outlet implements Serializable {
 
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
-    
+
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
 
@@ -44,7 +45,7 @@ public class Outlet implements Serializable {
         this.openTime = openTime;
         this.closeTime = closeTime;
     }
-    
+
     public Long getId() {
         return getOutletId();
     }
@@ -151,6 +152,7 @@ public class Outlet implements Serializable {
     /**
      * @return the cars
      */
+    @XmlTransient
     public List<Car> getCars() {
         return cars;
     }

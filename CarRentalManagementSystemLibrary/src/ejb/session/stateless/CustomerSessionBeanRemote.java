@@ -12,5 +12,7 @@ public interface CustomerSessionBeanRemote {
     Customer customerLogin(String email, String password) throws InvalidLoginCredentialsException;
 
     Customer createNewCustomer(Customer newCustomer) throws UnknownPersistenceException;
+
+    Customer retrieveCustomerByCustomerId(Long customerId) throws CustomerNotFoundException;
     
 }

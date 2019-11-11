@@ -1,11 +1,15 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -20,14 +24,26 @@ public class Customer implements Serializable {
     private Long customerId;
     @Column(length = 32, nullable = false)
     private String name;
-    @Column(length = 64, nullable = false)
+    @Column(length = 64, nullable = false, unique = true)
     private String email;
     @Column(length = 64, nullable = false)
     private String password;
+    
+    @OneToMany(mappedBy = "customer")
+    private List<RentalRecord> rentalRecords;
 
     public Customer() {
+        this.rentalRecords = new ArrayList<>();
     }
-    
+
+    public Customer(String name, String email, String password) {
+        this();
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+
     public Long getCustomerId() {
         return customerId;
     }
@@ -101,6 +117,21 @@ public class Customer implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the rentalRecords
+     */
+    @XmlTransient
+    public List<RentalRecord> getRentalRecords() {
+        return rentalRecords;
+    }
+
+    /**
+     * @param rentalRecords the rentalRecords to set
+     */
+    public void setRentalRecords(List<RentalRecord> rentalRecords) {
+        this.rentalRecords = rentalRecords;
     }
 
 }

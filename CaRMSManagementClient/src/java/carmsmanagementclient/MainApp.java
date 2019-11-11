@@ -5,6 +5,8 @@ import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.RentalRecordSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightsException;
@@ -21,8 +23,12 @@ public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private RentalRecordSessionBeanRemote rentalRecordSessionBeanRemote;
 
     private OperationsModule operationsModule;
+    private CustomerServiceModule customerServiceModule;
+    private SalesModule salesModule;
 
     private Employee currentEmployee;
 
@@ -31,12 +37,15 @@ public class MainApp {
 
     public MainApp(EmployeeSessionBeanRemote esbr, CarModelSessionBeanRemote cmsbr,
             CarSessionBeanRemote csbr, CarCategorySessionBeanRemote ccsbr,
-            OutletSessionBeanRemote osbr) {
+            OutletSessionBeanRemote osbr, RentalRateSessionBeanRemote rrsbr,
+            RentalRecordSessionBeanRemote rrsbr1) {
         this.employeeSessionBeanRemote = esbr;
         this.carModelSessionBeanRemote = cmsbr;
         this.carSessionBeanRemote = csbr;
         this.carCategorySessionBeanRemote = ccsbr;
         this.outletSessionBeanRemote = osbr;
+        this.rentalRateSessionBeanRemote = rrsbr;
+        this.rentalRecordSessionBeanRemote = rrsbr1;
     }
 
     public void runApp() {
@@ -60,7 +69,10 @@ public class MainApp {
 
                         operationsModule = new OperationsModule(currentEmployee,
                                 carModelSessionBeanRemote, carSessionBeanRemote,
-                                carCategorySessionBeanRemote, outletSessionBeanRemote);
+                                carCategorySessionBeanRemote, outletSessionBeanRemote, rentalRecordSessionBeanRemote,
+                                employeeSessionBeanRemote);
+                        customerServiceModule = new CustomerServiceModule(currentEmployee, rentalRecordSessionBeanRemote);
+                        salesModule = new SalesModule(currentEmployee, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialsException ex) {
                         System.out.println("Invalid login credentials " + ex.getMessage() + "\n");
@@ -91,7 +103,7 @@ public class MainApp {
         if (username.length() > 0 && password.length() > 0) {
             currentEmployee = employeeSessionBeanRemote.employeeLogin(username, password);
         } else {
-            throw new InvalidLoginCredentialsException("Missing login creditials!");
+            throw new InvalidLoginCredentialsException("\nMissing login creditials!");
         }
     }
 
@@ -105,15 +117,21 @@ public class MainApp {
                     + " with " + currentEmployee.getEmployeeType() + " rights.\n");
             System.out.println("1: Sales Menu");
             System.out.println("2: Operations Menu");
-            System.out.println("3: Logout\n");
+            System.out.println("3: Customer Service Menu");
+            System.out.println("4: Logout\n");
             response = 0;
 
-            while (response < 1 || response > 3) {
+            while (response < 1 || response > 4) {
                 System.out.print("> ");
                 response = sc.nextInt();
 
                 if (response == 1) {
-                    System.out.println("Unsupported action");
+                    try {
+                        salesModule.menuSales();
+                    } catch (InvalidAccessRightsException ex) {
+                        System.out.println("You do not have the rights to access this menu. "
+                                + ex.getMessage() + " Please try again.\n");
+                    }
                 } else if (response == 2) {
                     try {
                         operationsModule.menuOperations();
@@ -122,13 +140,19 @@ public class MainApp {
                                 + ex.getMessage() + " Please try again.\n");
                     }
                 } else if (response == 3) {
+                    try {
+                        customerServiceModule.menuCustomerService();
+                    } catch (InvalidAccessRightsException ex) {
+                        System.out.println("You do not have the rights to access this menu. "
+                                + ex.getMessage() + " Please try again.\n");
+                    }
+                } else if (response == 4) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again.\n");
                 }
-
             }
-            if (response == 3) {
+            if (response == 4) {
                 break;
             }
         }

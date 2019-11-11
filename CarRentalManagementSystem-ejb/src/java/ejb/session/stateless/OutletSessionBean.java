@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -48,4 +49,14 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         return query.getResultList();
     }
 
+    @Override
+    public Outlet retrieveOutletByOutletId(Long outletId) throws OutletNotFoundException {
+        Outlet outlet = em.find(Outlet.class, outletId);
+        if (outlet != null) {
+            return outlet;
+        } else {
+            throw new OutletNotFoundException("Outlet with ID " + outletId + " does not exist!");
+        }
+    }
+    
 }

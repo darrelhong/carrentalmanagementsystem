@@ -65,6 +65,16 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new UnknownPersistenceException("Could not create new customer. " + ex.getMessage());
         }
     }
+
+    @Override
+    public Customer retrieveCustomerByCustomerId(Long customerId) throws CustomerNotFoundException {
+        Customer customer = em.find(Customer.class, customerId);
+        if (customer != null) {
+            return customer;
+        } else {
+            throw new CustomerNotFoundException("Customer with ID " + customerId + " does not exist!");
+        }
+    }
     
     
 }

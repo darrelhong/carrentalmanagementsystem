@@ -1,6 +1,7 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -52,4 +53,24 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
             throw new InvalidLoginCredentialsException("Invalid user");
         }
     }
+
+    @Override
+    public List retrieveAllEmployeesByOutlet(java.lang.Long outletId) {
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.outlet.outletId = :outletId");
+        q.setParameter("outletId", outletId);
+        
+        return q.getResultList();
+    }
+
+    @Override
+    public Employee retrieveEmployeeById(Long employeeId) throws EmployeeNotFoundException {
+        Employee employee = em.find(Employee.class, employeeId);
+        if (employee != null) {
+            return employee;
+        } else {
+            throw new EmployeeNotFoundException("Employe with ID " + employeeId + "does not exist!");
+        }
+    }
+    
+    
 }

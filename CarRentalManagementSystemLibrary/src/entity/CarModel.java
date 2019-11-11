@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -29,16 +30,20 @@ public class CarModel implements Serializable {
     private String model;
     @Column(nullable = false)
     private Boolean disabled;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
-    
-    @OneToMany
+
+    @OneToMany(mappedBy = "carModel")
     private List<Car> cars;
+
+    @OneToMany(mappedBy = "carModel")
+    private List<RentalRecord> rentalRecords;
 
     public CarModel() {
         this.cars = new ArrayList<>();
+        this.rentalRecords = new ArrayList<>();
         this.disabled = false;
     }
 
@@ -48,7 +53,6 @@ public class CarModel implements Serializable {
         this.model = model;
     }
 
-    
     public Long getCarModelId() {
         return carModelId;
     }
@@ -141,6 +145,7 @@ public class CarModel implements Serializable {
     /**
      * @return the cars
      */
+    @XmlTransient
     public List<Car> getCars() {
         return cars;
     }
@@ -150,6 +155,21 @@ public class CarModel implements Serializable {
      */
     public void setCars(List<Car> cars) {
         this.cars = cars;
+    }
+
+    /**
+     * @return the rentalRecords
+     */
+    @XmlTransient
+    public List<RentalRecord> getRentalRecords() {
+        return rentalRecords;
+    }
+
+    /**
+     * @param rentalRecords the rentalRecords to set
+     */
+    public void setRentalRecords(List<RentalRecord> rentalRecords) {
+        this.rentalRecords = rentalRecords;
     }
 
 }
