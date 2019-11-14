@@ -24,9 +24,9 @@ public class Outlet implements Serializable {
     private Long outletId;
     @Column(length = 128, nullable = false, unique = true)
     private String address;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer openTime;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer closeTime;
 
     @OneToMany(mappedBy = "outlet")

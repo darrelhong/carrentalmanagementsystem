@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -25,8 +27,12 @@ public class Car implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
     @Column(length = 16, nullable = false, unique = true)
+    @NotNull
+    @Size(min = 1)
     private String licensePlate;
     @Column(length = 32, nullable = false)
+    @NotNull
+    @Size(max = 32)
     private String colour;
     @Column(nullable = false)
     private Boolean availabilityStatus;

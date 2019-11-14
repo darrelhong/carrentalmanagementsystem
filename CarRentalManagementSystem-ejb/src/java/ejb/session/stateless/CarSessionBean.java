@@ -13,6 +13,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.EntityDisabledException;
@@ -57,7 +58,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     // For remote client
     @Override
-    public Car createNewCar(Car newCar, Long categoryId, Long modelId, Long outletId) throws UnknownPersistenceException, EntityDisabledException, CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException {
+    public Car createNewCar(Car newCar, Long categoryId, Long modelId, Long outletId) throws UnknownPersistenceException, EntityDisabledException, CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, CarModelDisabledException {
         CarCategory cat = em.find(CarCategory.class, categoryId);
         if (cat == null) {
             throw new CarCategoryNotFoundException("Car category ID " + categoryId + " does not exist!");
@@ -65,6 +66,9 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         CarModel model = em.find(CarModel.class, modelId);
         if (model == null) {
             throw new CarModelNotFoundException("Car mode ID " + modelId + " does not exist!");
+        }
+        if (model.getDisabled()) {
+            throw new CarModelDisabledException("Cannot create car. Car model " + model.getMake() + " " + model.getModel() + " is disabled!");
         }
         Outlet outlet = em.find(Outlet.class, outletId);
         if (outlet == null) {

@@ -12,10 +12,14 @@ import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
 import entity.TransitDispatchRecord;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeType;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.EmployeeNotFoundException;
@@ -75,12 +79,15 @@ public class OperationsModule {
                 System.out.println("8: View transit driver dispatch records for current day reservations");
                 System.out.println("9: Assign Transit Driver");
                 System.out.println("10: Update transit as completed");
+                System.out.println("11: (testing only) Allocate cars for chosen day");
+                System.out.println("12: (testing only) View all transit dispatch records for chosen day (all outlets)");
+                System.out.println("13: (testing only) View transit dispatch records for chosen day (current outlet)");
                 System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - -");
-                System.out.println("11: Back\n");
+                System.out.println("14: Back\n");
                 response = 0;
 
                 OUTER:
-                while (response < 1 || response > 11) {
+                while (response < 1 || response > 14) {
                     System.out.print("> ");
                     response = sc.nextInt();
                     if (response == 1) {
@@ -104,12 +111,18 @@ public class OperationsModule {
                     } else if (response == 10) {
                         doUpdateTransitAsCompleted();
                     } else if (response == 11) {
+                        doAllocateCars();
+                    } else if (response == 12) {
+                        doViewAllTDRs();
+                    } else if (response == 13) {
+                        doViewTDR();
+                    } else if (response == 14) {
                         break;
                     } else {
                         System.out.println("Invalid option. Please try again.");
                     }
                 }
-                if (response == 11) {
+                if (response == 14) {
                     break;
                 }
             }
@@ -278,7 +291,7 @@ public class OperationsModule {
             System.out.println("\nNew car created!");
             Print.printCar(newCar);
         } catch (UnknownPersistenceException | EntityDisabledException | CarCategoryNotFoundException
-                | CarModelNotFoundException | OutletNotFoundException ex) {
+                | CarModelNotFoundException | OutletNotFoundException | CarModelDisabledException ex) {
             System.out.println(ex.getMessage());
         }
         System.out.println("\nPress Enter to continue...");
@@ -423,7 +436,7 @@ public class OperationsModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Operations Menu :: View Today's Transit Records ***\n");
 
-        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee);
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee, new Date());
         Print.printListTDR(tdrs);
 
         System.out.println("\nPress Enter to continue...");
@@ -434,7 +447,7 @@ public class OperationsModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Operations Menu :: Assign Transit Driver ***\n");
 
-        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee);
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee, new Date());
         Print.printListTDR(tdrs);
 
         System.out.print("Enter TDR ID> ");
@@ -462,12 +475,12 @@ public class OperationsModule {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** Operations Menu :: Update Transit as Completed ***\n");
 
-        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee);
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee, new Date());
         Print.printListTDR(tdrs);
-        
+
         System.out.print("Enter TDR ID to mark as completed> ");
         Long tdrId = Long.parseLong(sc.nextLine().trim());
-        
+
         try {
             TransitDispatchRecord result = rentalRecordSessionBeanRemote.markTransitAsCompleted(tdrId);
             System.out.println("Transit updated as completed!");
@@ -475,6 +488,74 @@ public class OperationsModule {
         } catch (TransitDispatchRecordNotFoundException | TransitNotAssignedException ex) {
             System.out.println(ex.getMessage());
         }
+
+        System.out.println("\nPress Enter to continue...");
+        sc.nextLine();
+    }
+
+    private void doAllocateCars() {
+        Scanner sc = new Scanner(System.in);
+        Date time;
+        System.out.println("*** Operations Module :: 11: (testing only) Allocate cars ***\n");
+
+        while (true) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyyy hh:mm a");
+                System.out.print("Enter date (dd/mm/yyyy hh:mm AM/PM)> ");
+                time = sdf.parse(sc.nextLine().trim());
+
+                rentalRecordSessionBeanRemote.allocateCars(time);
+                System.out.println("Successful allocation!");
+                break;
+            } catch (ParseException ex) {
+                System.out.println("Invalid date time input, please try again");
+            }
+        }
+        rentalRecordSessionBeanRemote.allocateCars(time);
+        System.out.println("Successful allocation!");
+        System.out.println("\nPress Enter to continue...");
+        sc.nextLine();
+    }
+
+    private void doViewAllTDRs() {
+        Scanner sc = new Scanner(System.in);
+        Date time;
+        System.out.println("*** Operations Module :: 12: (testing only) View all transit dispatch records for chosen day ***\n");
+
+        while (true) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyyy hh:mm a");
+                System.out.print("Enter date (dd/mm/yyyy hh:mm AM/PM)> ");
+                time = sdf.parse(sc.nextLine().trim());
+                break;
+            } catch (ParseException ex) {
+                System.out.println("Invalid date time input, please try again");
+            }
+        }
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveTransitDispatchRecords(time);
+        Print.printListTDR(tdrs);
+
+        System.out.println("\nPress Enter to continue...");
+        sc.nextLine();
+    }
+    
+    private void doViewTDR() {
+        Scanner sc = new Scanner(System.in);
+        Date time;
+        System.out.println("*** Operations Module :: 12: (testing only) View transit dispatch records for chosen day (current outlet) ***\n");
+
+        while (true) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyyy hh:mm a");
+                System.out.print("Enter date (dd/mm/yyyy hh:mm AM/PM)> ");
+                time = sdf.parse(sc.nextLine().trim());
+                break;
+            } catch (ParseException ex) {
+                System.out.println("Invalid date time input, please try again");
+            }
+        }
+        List<TransitDispatchRecord> tdrs = rentalRecordSessionBeanRemote.retrieveCurrentDayDispatchRecords(currentEmployee, time);
+        Print.printListTDR(tdrs);
 
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();

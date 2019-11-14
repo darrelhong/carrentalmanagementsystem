@@ -29,19 +29,19 @@ public class Print {
     }
 
     public static void printListTDR(List<TransitDispatchRecord> tdrs) {
-        System.out.printf("%6s%20s%20s%15s%20s%10s\n", "TDR ID", "From Outlet", "To Outlet", "Car Id", "Assigned Employee", "Completed");
+        System.out.printf("%6s%20s%20s%15s%20s%10s%32s\n", "TDR ID", "From Outlet", "To Outlet", "Car Id", "Assigned Employee", "Completed", "Booking Start");
         tdrs.forEach((tdr) -> {
             String employee = tdr.getEmployee() != null ? tdr.getEmployee().getName() : "not assigned";
             String carPlate = tdr.getRentalRecord().getCar() != null ? tdr.getRentalRecord().getCar().getLicensePlate() : "not allocated";
-            System.out.printf("%6s%20s%20s%15s%20s%10s\n", tdr.getId(), tdr.getFromOutlet().getAddress(), tdr.getRentalRecord().getFromOutlet().getAddress(), carPlate, employee, tdr.getCompleted());
+            System.out.printf("%6s%20s%20s%15s%20s%10s%32s\n", tdr.getId(), tdr.getFromOutlet().getAddress(), tdr.getRentalRecord().getFromOutlet().getAddress(), carPlate, employee, tdr.getCompleted(), tdr.getRentalRecord().getStartDateTime());
         });
     }
 
     public static void printTDR(TransitDispatchRecord tdr) {
-        System.out.printf("%6s%20s%20s%15s%20s%10s\n", "TDR ID", "From Outlet", "To Outlet", "Car Id", "Assigned Employee", "Completed");
+        System.out.printf("%6s%20s%20s%15s%20s%10s%32s\n", "TDR ID", "From Outlet", "To Outlet", "Car Id", "Assigned Employee", "Completed", "Booking Start");
         String employee = tdr.getEmployee() != null ? tdr.getEmployee().getName() : "not assigned";
         String carPlate = tdr.getRentalRecord().getCar() != null ? tdr.getRentalRecord().getCar().getLicensePlate() : "not allocated";
-        System.out.printf("%6s%20s%20s%15s%20s%10s\n", tdr.getId(), tdr.getFromOutlet().getAddress(), tdr.getRentalRecord().getFromOutlet().getAddress(), carPlate, employee, tdr.getCompleted());
+        System.out.printf("%6s%20s%20s%15s%20s%10s%32s\n", tdr.getId(), tdr.getFromOutlet().getAddress(), tdr.getRentalRecord().getFromOutlet().getAddress(), carPlate, employee, tdr.getCompleted(), tdr.getRentalRecord().getStartDateTime());
     }
 
     public static void printListRentalRecords(List<RentalRecord> records) {
@@ -80,22 +80,24 @@ public class Print {
 
     public static void printListOutlets(List<Outlet> outlets) {
         System.out.println("List of outlets:");
-        System.out.printf("%9s%32s\n", "Outlet ID", "Outlet Address");
+        System.out.printf("%9s%32s%6s%7s\n", "Outlet ID", "Outlet Address", "Opens", "Closes");
         outlets.forEach((outlet) -> {
-            System.out.printf("%9s%32s\n", outlet.getOutletId(), outlet.getAddress());
+            String opens = outlet.getOpenTime() != null ? outlet.getOpenTime().toString() : "null";
+            String closes = outlet.getCloseTime() != null ? outlet.getCloseTime().toString() : "null";
+            System.out.printf("%9s%32s%6s%7s\n", outlet.getOutletId(), outlet.getAddress(), opens, closes);
         });
     }
 
     public static void printCar(Car car) {
         System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
-        String status = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
+        String status = car.getAvailabilityStatus() ? "AVAIL" : "UNAVAIL";
         System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(), status, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(), car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(), car.getOutlet().getOutletId());
     }
 
     public static void printListCars(List<Car> cars) {
         System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", "Car ID", "Status", "Car Category", "Car Make", "Car Model", "License Plate", "Colour", "Outlet ID");
         cars.forEach((car) -> {
-            String status = car.getAvailabilityStatus() ? "UNAVAIL" : "AVAIL";
+            String status = car.getAvailabilityStatus() ? "AVAIL" : "UNAVAIL";
             System.out.printf("%6s%8s%25s%15s%15s%18s%15s%10s\n", car.getCarId(),
                     status, car.getCarCategory().getCarCategory(), car.getCarModel().getMake(),
                     car.getCarModel().getModel(), car.getLicensePlate(), car.getColour(),
@@ -106,14 +108,18 @@ public class Print {
     public static void printRate(RentalRate rate) {
         System.out.printf("%2s%20s%40s%9s%8s%31s%31s\n", "ID", "Category", "Name", "Rate", "Type", "Start Date", "End Date");
         String rateType = rate.getIsPromo() ? "PROMO" : "NORMAL";
-        System.out.printf("%2s%20s%40s%9.2f%8s%31s%31s\n", rate.getRentalRateId(), rate.getCarCategory().getCarCategory(), rate.getName(), rate.getRate(), rateType, rate.getStartDate(), rate.getEndDate());
+        String start = rate.getStartDate() != null ? rate.getStartDate().toString() : "null";
+        String end = rate.getEndDate() != null ? rate.getEndDate().toString() : "null";
+        System.out.printf("%2s%20s%40s%9.2f%8s%31s%31s\n", rate.getRentalRateId(), rate.getCarCategory().getCarCategory(), rate.getName(), rate.getRate(), rateType, start, end);
     }
 
     public static void printListRates(List<RentalRate> rates) {
         System.out.printf("%2s%20s%40s%9s%8s%31s%31s\n", "ID", "Category", "Name", "Rate", "Type", "Start Date", "End Date");
         rates.forEach((rate) -> {
             String rateType = rate.getIsPromo() ? "PROMO" : "NORMAL";
-            System.out.printf("%2s%20s%40s%9.2f%8s%31s%31s\n", rate.getRentalRateId(), rate.getCarCategory().getCarCategory(), rate.getName(), rate.getRate(), rateType, rate.getStartDate(), rate.getEndDate());
+            String start = rate.getStartDate() != null ? rate.getStartDate().toString() : "null";
+            String end = rate.getEndDate() != null ? rate.getEndDate().toString() : "null";
+            System.out.printf("%2s%20s%40s%9.2f%8s%31s%31s\n", rate.getRentalRateId(), rate.getCarCategory().getCarCategory(), rate.getName(), rate.getRate(), rateType, start, end);
         });
     }
 }

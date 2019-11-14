@@ -95,8 +95,9 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
 
     private BigDecimal calculatePenalty(RentalRecord toCancel) {
         try {
+             Date now = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyyy hh:mm a");
-            Date now = sdf.parse("1/1/2019 12:00 AM");
+            Date nowtemp = sdf.parse("1/1/2019 12:00 AM");
             BigDecimal result = new BigDecimal(0);
             long timeDiff = toCancel.getStartDateTime().getTime() - now.getTime();
             if (timeDiff > 14 * 24 * 3600 * 1000) {
@@ -127,12 +128,13 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
     }
 
     @Override
-    public void allocateCars() {
-//        Date now = new Date();
-        Date now = new Date(119, 0, 1, 0, 0);
+    public void allocateCars(Date time) {
+        Date now = time;
+//        Date now = new Date(119, 0, 1, 0, 0);
         Date endOfDay = new Date(now.getTime() + 24 * 3600 * 1000);
         System.out.println(now);
         System.out.println(endOfDay);
+//        Query q = em.createQuery("SELECT rr FROM RentalRecord rr WHERE rr.startDateTime >= :now AND rr.startDateTime <= :now");
         Query q = em.createQuery("SELECT rr FROM RentalRecord rr WHERE rr.cancelled = FALSE AND rr.startDateTime BETWEEN :now AND :endOfDay ORDER BY rr.carModel DESC");
         q.setParameter("now", now);
         q.setParameter("endOfDay", endOfDay);
@@ -213,9 +215,9 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
     }
 
     @Override
-    public List retrieveTransitDispatchRecords() {
-//        Date now = new Date();
-        Date now = new Date(119, 0, 1, 0, 0);
+    public List retrieveTransitDispatchRecords(Date time) {
+        Date now = new Date();
+//        Date now = new Date(119, 0, 1, 0, 0);
         Date startOfDay = new Date(now.getYear(), now.getMonth(), now.getDate());
         Date endOfDay = new Date(now.getTime() + 24 * 3600 * 1000);
 
@@ -229,9 +231,10 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
     }
 
     @Override
-    public List retrieveCurrentDayDispatchRecords(Employee employee) {
+    public List retrieveCurrentDayDispatchRecords(Employee employee, Date time) {
 //        Date now = new Date();
-        Date now = new Date(119, 0, 1, 0, 0);
+//        Date now = new Date(119, 0, 1, 0, 0);
+        Date now = time;
         Date startOfDay = new Date(now.getYear(), now.getMonth(), now.getDate());
         Date endOfDay = new Date(now.getTime() + 24 * 3600 * 1000);
 

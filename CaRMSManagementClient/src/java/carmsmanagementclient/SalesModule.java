@@ -78,6 +78,7 @@ public class SalesModule {
     private void createRentalRate() {
         Scanner sc = new Scanner(System.in);
         RentalRate newRentalRate = new RentalRate();
+        String input;
         Date startDate;
         Date endDate;
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
@@ -113,8 +114,14 @@ public class SalesModule {
             while (true) {
                 try {
                     System.out.print("Enter validity start date (dd/mm/yyyy hh:mm AM/PM)> ");
-                    startDate = inputDateFormat.parse(sc.nextLine().trim());
-                    break;
+                    input = sc.nextLine().trim();
+                    if (input.equals("")) {
+                        startDate = null;
+                        break;
+                    } else {
+                        startDate = inputDateFormat.parse(input);
+                        break;
+                    }
                 } catch (ParseException ex) {
                     System.out.println("Invalid date time input, please try again");
                 }
@@ -122,14 +129,22 @@ public class SalesModule {
             while (true) {
                 try {
                     System.out.print("Enter validity end date (dd/mm/yyyy hh:mm AM/PM)> ");
-                    endDate = inputDateFormat.parse(sc.nextLine().trim());
-                    break;
+                    input = sc.nextLine().trim();
+                    if (input.equals("")) {
+                        endDate = null;
+                        break;
+                    } else {
+                        endDate = inputDateFormat.parse(input);
+                        break;
+                    }
                 } catch (ParseException ex) {
                     System.out.println("Invalid date time input, please try again");
                 }
             }
-            if (!startDate.before(endDate)) {
-                System.out.println("\nInvalid date time input, end date earlier than start date! Please try again\n");
+            if ((startDate != null && endDate == null) || (startDate == null && endDate != null)) {
+                System.out.println("\nInvalid date time input, one null value! Please try again.\n");
+            } else if (startDate != null && endDate != null && !startDate.before(endDate)) {
+                System.out.println("\nInvalid date time input, end date earlier than start date! Please try again.\n");
             } else {
                 newRentalRate.setStartDate(startDate);
                 newRentalRate.setEndDate(endDate);
@@ -145,8 +160,7 @@ public class SalesModule {
             System.out.println(ex.getMessage());
         }
 
-        System.out.println(
-                "\nPress Enter to continue...");
+        System.out.println("\nPress Enter to continue...");
         sc.nextLine();
     }
 

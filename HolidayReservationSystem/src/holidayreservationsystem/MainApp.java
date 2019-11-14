@@ -267,7 +267,7 @@ public class MainApp {
                 break;
             } else if (input.equals("2")) {
                 try {
-                    confirmReservation(partnerId, ccNum, true, categoryId, modelId, startXML, endXML, pickupOutletId, returnOutletId, totalRate, externalCustName);
+                    confirmReservation(partnerId, ccNum, false, categoryId, modelId, startXML, endXML, pickupOutletId, returnOutletId, totalRate, externalCustName);
                     System.out.println("Reservation confirmed!");
                 } catch (UnknownPersistenceException_Exception ex) {
                     System.out.println("\n" + ex.getMessage());

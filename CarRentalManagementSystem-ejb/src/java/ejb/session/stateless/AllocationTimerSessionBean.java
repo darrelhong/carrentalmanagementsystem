@@ -15,11 +15,11 @@ public class AllocationTimerSessionBean implements AllocationSessionBeanRemote, 
     @EJB(name = "RentalRecordSessionBeanLocal")
     private RentalRecordSessionBeanLocal rentalRecordSessionBeanLocal;
 
-    @Schedule(dayOfWeek = "*", hour = "0")
+    @Schedule(dayOfWeek = "*", hour = "2")
     public void allocateCarsTimer() {
         System.out.println("Allocate cars event: " + new Date());
         
-        rentalRecordSessionBeanLocal.allocateCars();
+        rentalRecordSessionBeanLocal.allocateCars(new Date());
     }
 
     // Add business logic below. (Right-click in editor and choose

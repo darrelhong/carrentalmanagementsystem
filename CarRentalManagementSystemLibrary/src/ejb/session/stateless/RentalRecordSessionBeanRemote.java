@@ -4,6 +4,7 @@ import entity.Customer;
 import entity.Employee;
 import entity.RentalRecord;
 import entity.TransitDispatchRecord;
+import java.util.Date;
 import java.util.List;
 import util.exception.CancellationErrorException;
 import util.exception.CarNotAssignedException;
@@ -26,9 +27,9 @@ public interface RentalRecordSessionBeanRemote {
 
     String cancelReservation(Long recordId) throws CancellationErrorException;
 
-    List retrieveTransitDispatchRecords();
+    List retrieveTransitDispatchRecords(Date time);
 
-    List retrieveCurrentDayDispatchRecords(Employee employee);
+    List retrieveCurrentDayDispatchRecords(Employee employee, Date time);
 
     TransitDispatchRecord assignEmployeeToTDR(Long tdrId, Long employeeId) throws EmployeeNotFoundException, TransitDispatchRecordNotFoundException;
 
@@ -40,4 +41,5 @@ public interface RentalRecordSessionBeanRemote {
 
     List retrieveAllPartnerReservations(java.lang.String partnerId) throws PartnerNotFoundException;
 
+    void allocateCars(Date time);
 }

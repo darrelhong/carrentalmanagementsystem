@@ -71,12 +71,12 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         CarCategory category = carCategorySessionBeanLocal.retrieveCarCategoryById(categoryId);
         bookingCarCatgory = category;
         Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(pickupOutletId);
-        if (start.getHours() < pickupOutlet.getOpenTime()) {
+        if (pickupOutlet.getOpenTime() != null && start.getHours() < pickupOutlet.getOpenTime()) {
             throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " opens at " + String.format("%02d:00", pickupOutlet.getOpenTime()) + "H");
         }
         bookingPickupOutlet = pickupOutlet;
         Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(returnOutletId);
-        if (end.getHours() > returnOutlet.getCloseTime()) {
+        if (returnOutlet.getCloseTime() != null && end.getHours() > returnOutlet.getCloseTime()) {
             throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " closes at " + String.format("%02d:00", pickupOutlet.getCloseTime()) + "H");
         }
         bookingReturnOutlet = returnOutlet;
@@ -130,12 +130,12 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         CarModel model = carModelSessionBeanLocal.retrieveCarModelById(modelId);
         bookingCarModel = model;
         Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(pickupOutletId);
-        if (start.getHours() < pickupOutlet.getOpenTime()) {
+        if (pickupOutlet.getOpenTime() != null && start.getHours() < pickupOutlet.getOpenTime()) {
             throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " opens at " + String.format("%02d:00", pickupOutlet.getOpenTime()) + "H");
         }
         bookingPickupOutlet = pickupOutlet;
         Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(returnOutletId);
-        if (end.getHours() > returnOutlet.getCloseTime()) {
+        if (pickupOutlet.getOpenTime() != null && end.getHours() > returnOutlet.getCloseTime()) {
             throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " closes at " + String.format("%02d:00", pickupOutlet.getCloseTime()) + "H");
         }
         bookingReturnOutlet = returnOutlet;
@@ -187,7 +187,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         Date curr = new Date(start.getTime());
         while (true) {
             if (end.after(curr)) {
-                Query rentalRateQuery = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.disabled = FALSE AND :curr BETWEEN r.startDate AND r.endDate ORDER BY r.rate ASC");
+                Query rentalRateQuery = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.disabled = FALSE AND (:curr BETWEEN r.startDate AND r.endDate OR (r.startDate IS NULL AND r.endDate IS NULL)) ORDER BY r.rate ASC");
                 rentalRateQuery.setParameter("carCategoryId", categoryId);
                 rentalRateQuery.setParameter("curr", curr);
                 List<RentalRate> rentalRate = rentalRateQuery.setMaxResults(1).getResultList();
@@ -200,7 +200,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
                 curr.setTime(curr.getTime() + 24 * 3600 * 1000);
             } else {
                 if (end.getDay() == curr.getDay()) {
-                    Query rentalRateQuery = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.disabled = FALSE AND :curr BETWEEN r.startDate AND r.endDate ORDER BY r.rate ASC");
+                    Query rentalRateQuery = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.disabled = FALSE AND (:curr BETWEEN r.startDate AND r.endDate OR (r.startDate IS NULL AND r.endDate IS NULL)) ORDER BY r.rate ASC");
                     rentalRateQuery.setParameter("carCategoryId", categoryId);
                     rentalRateQuery.setParameter("curr", curr);
                     List<RentalRate> rentalRate = rentalRateQuery.setMaxResults(1).getResultList();
@@ -215,6 +215,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         }
     }
 
+    //ejb client
     @Override
     public void confirmReservation(Customer customer, String ccNum, boolean immediatePayment) throws CustomerNotFoundException, UnknownPersistenceException {
         Customer cust = em.find(Customer.class, customer.getCustomerId());

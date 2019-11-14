@@ -8,5 +8,6 @@ public enum EmployeeType {
     ADMIN,
     OPERATIONS,
     SALES,
-    CUSTOMERSERVICE
+    CUSTOMERSERVICE,
+    EMPLOYEE
 }
