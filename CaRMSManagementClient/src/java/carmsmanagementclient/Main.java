@@ -43,6 +43,7 @@ public class Main {
                 carSessionBeanRemote, carCategorySessionBeanRemote, outletSessionBeanRemote, rentalRateSessionBeanRemote,
         rentalRecordSessionBeanRemote);
         mainApp.runApp();
+        System.out.println("thdtr");
     }
     
 }

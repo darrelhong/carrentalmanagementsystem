@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 import util.enumeration.EmployeeType;
 
@@ -24,12 +26,22 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
+    
     @Column(length = 32, nullable = false)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String name;
+    
     @Column(length = 32, nullable = false, unique = true)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String username;
+    
     @Column(length = 32, nullable = false)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String password;
+    
     @Enumerated(EnumType.STRING)
     private EmployeeType employeeType;
     
