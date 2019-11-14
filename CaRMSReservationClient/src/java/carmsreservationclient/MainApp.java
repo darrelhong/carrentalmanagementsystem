@@ -18,10 +18,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CancellationErrorException;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CustomerNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InsufficientInventoryException;
 import util.exception.InvalidLoginCredentialsException;
 import util.exception.NoRateFoundException;
@@ -37,6 +43,9 @@ import util.helper.Print;
  */
 public class MainApp {
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
@@ -48,11 +57,14 @@ public class MainApp {
     private Customer currentCustomer;
 
     public MainApp() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public MainApp(CustomerSessionBeanRemote csbr, CarCategorySessionBeanRemote ccsbr,
             CarModelSessionBeanRemote cmsbr, CarSessionBeanRemote csbr1,
             OutletSessionBeanRemote osbr, BookingSessionBeanRemote bsbr, RentalRecordSessionBeanRemote rrsbr) {
+        this();
         this.customerSessionBeanRemote = csbr;
         this.carCategorySessionBeanRemote = ccsbr;
         this.carModelSessionBeanRemote = cmsbr;
@@ -117,16 +129,31 @@ public class MainApp {
         customer.setEmail(returnNonEmptyString(sc));
         System.out.print("Enter password> ");
         customer.setPassword(returnNonEmptyString(sc));
+        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
 
-        try {
-            customer = customerSessionBeanRemote.createNewCustomer(customer);
-            System.out.println("New customer created. ID = " + customer.getCustomerId()
-                    + " username: " + customer.getName() + " email: " + customer.getEmail());
-        } catch (UnknownPersistenceException ex) {
-            System.out.println(ex.getMessage());
+        if (constraintViolations.isEmpty()) {
+            try {
+                customer = customerSessionBeanRemote.createNewCustomer(customer);
+                System.out.println("New customer created. ID = " + customer.getCustomerId()
+                        + " username: " + customer.getName() + " email: " + customer.getEmail());
+            } catch (UnknownPersistenceException | InputDataValidationException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            showInputDataValidationErrorsForCustomer(constraintViolations);
         }
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
+    }
+
+    private void showInputDataValidationErrorsForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
     }
 
     private void doLogin() throws InvalidLoginCredentialsException {
