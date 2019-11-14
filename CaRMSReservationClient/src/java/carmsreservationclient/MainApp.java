@@ -168,7 +168,7 @@ public class MainApp {
             System.out.print("Enter desired car category> ");
             response = sc.nextLine().trim();
             if (Long.parseLong(response) < 0) {
-                System.out.println("Invalid response, please try again");
+                System.out.println("Invalid response, Please try again");
             } else {
                 categoryId = Long.parseLong(response);
                 break;
