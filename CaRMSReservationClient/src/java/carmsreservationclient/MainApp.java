@@ -39,7 +39,7 @@ import util.helper.Print;
 
 /**
  *
- * @author darre
+ * @author
  */
 public class MainApp {
 

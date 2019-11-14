@@ -5,6 +5,7 @@ import entity.CarCategory;
 import entity.CarModel;
 import entity.Outlet;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -12,17 +13,22 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.EntityDisabledException;
+import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(CarSessionBeanLocal.class)
@@ -31,34 +37,44 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     public CarSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     // For data initialisation
     @Override
-    public Car createNewCar(Car newCar, CarCategory carCategory, CarModel carModel, Outlet outlet) throws UnknownPersistenceException {
+    public Car createNewCar(Car newCar, CarCategory carCategory, CarModel carModel, Outlet outlet) throws UnknownPersistenceException, InputDataValidationException {
         CarCategory cat = em.find(CarCategory.class, carCategory.getCarCategoryId());
         CarModel model = em.find(CarModel.class, carModel.getCarModelId());
         Outlet out = em.find(Outlet.class, outlet.getOutletId());
         try {
-            em.persist(newCar);
-            newCar.setCarCategory(cat);
-            cat.getCars().add(newCar);
-            newCar.setCarModel(model);
-            model.getCars().add(newCar);
-            newCar.setOutlet(out);
-            out.getCars().add(newCar);
-            em.flush();
-            return newCar;
+            Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newCar);
+                newCar.setCarCategory(cat);
+                cat.getCars().add(newCar);
+                newCar.setCarModel(model);
+                model.getCars().add(newCar);
+                newCar.setOutlet(out);
+                out.getCars().add(newCar);
+                em.flush();
+                return newCar;
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create new car " + ex.getMessage());
         }
     }
-
+    
     // For remote client
     @Override
-    public Car createNewCar(Car newCar, Long categoryId, Long modelId, Long outletId) throws UnknownPersistenceException, EntityDisabledException, CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, CarModelDisabledException {
+    public Car createNewCar(Car newCar, Long categoryId, Long modelId, Long outletId) throws UnknownPersistenceException, EntityDisabledException, CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, CarModelDisabledException, InputDataValidationException {
         CarCategory cat = em.find(CarCategory.class, categoryId);
         if (cat == null) {
             throw new CarCategoryNotFoundException("Car category ID " + categoryId + " does not exist!");
@@ -78,15 +94,20 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             throw new EntityDisabledException("Car model ID " + modelId + " is disabled!");
         }
         try {
-            em.persist(newCar);
-            newCar.setCarCategory(cat);
-            cat.getCars().add(newCar);
-            newCar.setCarModel(model);
-            model.getCars().add(newCar);
-            newCar.setOutlet(outlet);
-            outlet.getCars().add(newCar);
-            em.flush();
-            return newCar;
+            Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newCar);
+                newCar.setCarCategory(cat);
+                cat.getCars().add(newCar);
+                newCar.setCarModel(model);
+                model.getCars().add(newCar);
+                newCar.setOutlet(outlet);
+                outlet.getCars().add(newCar);
+                em.flush();
+                return newCar;
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create new car " + ex.getMessage());
         }
@@ -162,5 +183,15 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         carToUpdate.setColour(car.getColour());
         return carToUpdate;
     }
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
+        String msg = "Input data validation error!:";
 
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
+    
 }

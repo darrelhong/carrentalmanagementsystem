@@ -5,13 +5,14 @@ import entity.CarModel;
 import java.util.List;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
 public interface CarModelSessionBeanLocal {
 
-    CarModel createNewCarModel(CarModel newCarModel, CarCategory carCategory) throws UnknownPersistenceException;
+    CarModel createNewCarModel(CarModel newCarModel, CarCategory carCategory) throws UnknownPersistenceException, InputDataValidationException;
 
-    CarModel createNewCarModel(CarModel newCarModel, Long categoryId) throws UnknownPersistenceException, CarCategoryNotFoundException;
+    CarModel createNewCarModel(CarModel newCarModel, Long categoryId) throws UnknownPersistenceException, CarCategoryNotFoundException, InputDataValidationException;
 
     List retrieveAllCarModels();
 

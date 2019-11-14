@@ -16,7 +16,7 @@ import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(PartnerSessionBeanLocal.class)

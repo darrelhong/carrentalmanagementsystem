@@ -3,6 +3,7 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import entity.CarModel;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -10,13 +11,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(CarModelSessionBeanLocal.class)
@@ -25,19 +31,29 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     public CarModelSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
     // For local client
     @Override
-    public CarModel createNewCarModel(CarModel newCarModel, CarCategory carCategory) throws UnknownPersistenceException {
+    public CarModel createNewCarModel(CarModel newCarModel, CarCategory carCategory) throws UnknownPersistenceException, InputDataValidationException{
         CarCategory cat = em.find(CarCategory.class, carCategory.getCarCategoryId());
         try {
-            em.persist(newCarModel);
-            newCarModel.setCarCategory(cat);
-            cat.getCarModels().add(newCarModel);
-            em.flush();
-            return newCarModel;
+            Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(newCarModel);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newCarModel);
+                newCarModel.setCarCategory(cat);
+                cat.getCarModels().add(newCarModel);
+                em.flush();
+                return newCarModel;
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create card model " + ex.getMessage());
         }
@@ -45,17 +61,23 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     
     // For remote client
     @Override
-    public CarModel createNewCarModel(CarModel newCarModel, Long categoryId) throws UnknownPersistenceException, CarCategoryNotFoundException {
+    public CarModel createNewCarModel(CarModel newCarModel, Long categoryId) throws UnknownPersistenceException, CarCategoryNotFoundException, InputDataValidationException {
         CarCategory cat = em.find(CarCategory.class, categoryId);
         if (cat == null) {
             throw new CarCategoryNotFoundException("Car category ID " + categoryId + " does not exist!");
         }
         try {
-            em.persist(newCarModel);
-            newCarModel.setCarCategory(cat);
-            cat.getCarModels().add(newCarModel);
-            em.flush();
-            return newCarModel;
+            Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(newCarModel);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newCarModel);
+                newCarModel.setCarCategory(cat);
+                cat.getCarModels().add(newCarModel);
+                em.flush();
+                return newCarModel;
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+            
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create card model " + ex.getMessage());
         }
@@ -117,6 +139,16 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
             throw new CarModelNotFoundException("Car model ID " + modelId + " does not exist!");
         }
         return carModel;
+    }
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
     
 }

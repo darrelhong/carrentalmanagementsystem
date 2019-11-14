@@ -33,7 +33,7 @@ import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateful
 @Local(BookingSessionBeanLocal.class)

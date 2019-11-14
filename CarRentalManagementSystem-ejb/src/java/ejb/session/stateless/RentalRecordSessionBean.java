@@ -33,7 +33,7 @@ import util.helper.Print;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(RentalRecordSessionBeanLocal.class)

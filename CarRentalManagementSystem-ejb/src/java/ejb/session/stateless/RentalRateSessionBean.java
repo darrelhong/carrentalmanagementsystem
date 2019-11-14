@@ -3,6 +3,7 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import entity.RentalRate;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -10,13 +11,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(RentalRateSessionBeanLocal.class)
@@ -25,23 +31,33 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     public RentalRateSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     // For remote client
     @Override
-    public RentalRate createRentalRate(RentalRate newRentalRate, Long carCategoryId) throws UnknownPersistenceException, CarCategoryNotFoundException {
+    public RentalRate createRentalRate(RentalRate newRentalRate, Long carCategoryId) throws UnknownPersistenceException, CarCategoryNotFoundException, InputDataValidationException {
         CarCategory cat = em.find(CarCategory.class, carCategoryId);
         if (cat == null) {
             throw new CarCategoryNotFoundException("Car category ID " + carCategoryId + " does not exist!");
         }
         try {
-            em.persist(newRentalRate);
-            cat.getRentalRates().add(newRentalRate);
-            newRentalRate.setCarCategory(cat);
-            em.flush();
-            return newRentalRate;
+            Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newRentalRate);
+                cat.getRentalRates().add(newRentalRate);
+                newRentalRate.setCarCategory(cat);
+                em.flush();
+                return newRentalRate;
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create new rental rate. " + ex.getMessage());
         }
@@ -49,14 +65,19 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     // For local client
     @Override
-    public RentalRate createRentalRate(RentalRate newRentalRate, CarCategory carCategory) throws UnknownPersistenceException {
+    public RentalRate createRentalRate(RentalRate newRentalRate, CarCategory carCategory) throws UnknownPersistenceException, InputDataValidationException {
         CarCategory cat = em.find(CarCategory.class, carCategory.getCarCategoryId());
         try {
-            em.persist(newRentalRate);
-            cat.getRentalRates().add(newRentalRate);
-            newRentalRate.setCarCategory(cat);
-            em.flush();
-            return newRentalRate;
+            Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
+            if (constraintViolations.isEmpty()) {
+                em.persist(newRentalRate);
+                cat.getRentalRates().add(newRentalRate);
+                newRentalRate.setCarCategory(cat);
+                em.flush();
+                return newRentalRate;
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException("Could not create new rental rate. " + ex.getMessage());
         }
@@ -107,5 +128,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         // Rental rate only deleted when carcategory deleted
         toDelete.setDisabled(true);
         return 1;
+    }
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
 }

@@ -14,7 +14,7 @@ import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(CarCategorySessionBeanLocal.class)

@@ -17,6 +17,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.enumeration.EmployeeType;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelDisabledException;
@@ -24,6 +29,7 @@ import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.EntityDisabledException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightsException;
 import util.exception.OutletNotFoundException;
 import util.exception.TransitDispatchRecordNotFoundException;
@@ -36,6 +42,9 @@ import util.helper.Print;
  * @author darre
  */
 public class OperationsModule {
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     private CarSessionBeanRemote carSessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
@@ -47,12 +56,15 @@ public class OperationsModule {
     private Employee currentEmployee;
 
     public OperationsModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public OperationsModule(Employee currentEmployee, CarModelSessionBeanRemote cmsbr,
             CarSessionBeanRemote csbr, CarCategorySessionBeanRemote ccsbr,
             OutletSessionBeanRemote osbr, RentalRecordSessionBeanRemote rrsbr,
             EmployeeSessionBeanRemote esbr) {
+        this();
         this.currentEmployee = currentEmployee;
         this.carModelSessionBeanRemote = cmsbr;
         this.carSessionBeanRemote = csbr;
@@ -145,17 +157,32 @@ public class OperationsModule {
         newCarModel.setMake(returnNonEmptyString(sc));
         System.out.print("Enter new car model> ");
         newCarModel.setModel(returnNonEmptyString(sc));
+        Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(newCarModel);
 
-        try {
-            newCarModel = carModelSessionBeanRemote.createNewCarModel(newCarModel, categoryId);
-            System.out.println("\nNew model created!");
-            Print.printCarModel(newCarModel);
-//            System.out.println("New car model created. ID = " + newCarModel.getCarModelId() + ": " + newCarModel.getMake() + " " + newCarModel.getModel() + "\n");
-        } catch (CarCategoryNotFoundException | UnknownPersistenceException ex) {
-            System.out.println(ex.getMessage());
+        if (constraintViolations.isEmpty()) {
+            try {
+                newCarModel = carModelSessionBeanRemote.createNewCarModel(newCarModel, categoryId);
+                System.out.println("\nNew model created!");
+                Print.printCarModel(newCarModel);
+    //            System.out.println("New car model created. ID = " + newCarModel.getCarModelId() + ": " + newCarModel.getMake() + " " + newCarModel.getModel() + "\n");
+            } catch (CarCategoryNotFoundException | UnknownPersistenceException | InputDataValidationException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            showInputDataValidationErrorsForCarModel(constraintViolations);
         }
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
+    }
+    
+    private void showInputDataValidationErrorsForCarModel(Set<ConstraintViolation<CarModel>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
     }
 
     private void doViewAllCarModels() {
@@ -285,17 +312,32 @@ public class OperationsModule {
         newCar.setLicensePlate(returnNonEmptyString(sc));
         System.out.print("Enter new car colour> ");
         newCar.setColour(returnNonEmptyString(sc));
+        Set<ConstraintViolation<Car>> constraintViolations = validator.validate(newCar);
 
-        try {
-            newCar = carSessionBeanRemote.createNewCar(newCar, categoryId, modelId, outletId);
-            System.out.println("\nNew car created!");
-            Print.printCar(newCar);
-        } catch (UnknownPersistenceException | EntityDisabledException | CarCategoryNotFoundException
-                | CarModelNotFoundException | OutletNotFoundException | CarModelDisabledException ex) {
-            System.out.println(ex.getMessage());
+        if (constraintViolations.isEmpty()) {
+            try {
+                newCar = carSessionBeanRemote.createNewCar(newCar, categoryId, modelId, outletId);
+                System.out.println("\nNew car created!");
+                Print.printCar(newCar);
+            } catch (UnknownPersistenceException | EntityDisabledException | CarCategoryNotFoundException
+                    | CarModelNotFoundException | OutletNotFoundException | CarModelDisabledException | InputDataValidationException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            showInputDataValidationErrorsForCar(constraintViolations);
         }
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
+    }
+    
+    private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
     }
 
     private void doViewAllCars() {

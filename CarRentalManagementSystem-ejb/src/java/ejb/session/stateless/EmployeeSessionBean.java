@@ -15,7 +15,7 @@ import util.exception.InvalidLoginCredentialsException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(EmployeeSessionBeanLocal.class)

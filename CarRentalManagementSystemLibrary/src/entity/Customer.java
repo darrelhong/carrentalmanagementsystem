@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Entity
 public class Customer implements Serializable {

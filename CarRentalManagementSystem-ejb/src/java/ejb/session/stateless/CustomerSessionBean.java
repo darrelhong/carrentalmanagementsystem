@@ -22,7 +22,7 @@ import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 @Local(CustomerSessionBeanLocal.class)

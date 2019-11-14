@@ -31,12 +31,13 @@ import javax.ejb.Startup;
 import util.enumeration.EmployeeType;
 import util.enumeration.PartnerType;
 import util.exception.EmployeeNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Singleton
 @LocalBean
@@ -146,6 +147,7 @@ public class DataInitSessionBean {
             CarModel bmw5seriesModel = new CarModel("BMW", "5 Series");
             CarModel a6Model = new CarModel("Audi", "A6");
 
+            
             corollaModel = carModelSessionBeanLocal.createNewCarModel(corollaModel, standardSedan);
             civicModel = carModelSessionBeanLocal.createNewCarModel(civicModel, standardSedan);
             sunnyModel = carModelSessionBeanLocal.createNewCarModel(sunnyModel, standardSedan);
@@ -342,7 +344,7 @@ public class DataInitSessionBean {
 //            bookingSessionBeanLocal.createTestRentalRecord(rr6);
 //            rentalRecordSessionBeanLocal.allocateCars();
 //            rentalRecordSessionBeanLocal.retrieveTransitDispatchRecords();
-        } catch (UnknownPersistenceException | ParseException ex) {
+        } catch (UnknownPersistenceException | ParseException | InputDataValidationException ex) {
             ex.printStackTrace();
         }
     }

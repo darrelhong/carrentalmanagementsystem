@@ -3,7 +3,7 @@ package ejb.session.stateless;
 
 /**
  *
- * @author darre
+ * @author 
  */
 public interface AllocationSessionBeanLocal {
     

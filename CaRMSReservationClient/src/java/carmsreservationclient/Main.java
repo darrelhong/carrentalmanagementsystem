@@ -11,7 +11,7 @@ import javax.ejb.EJB;
 
 /**
  *
- * @author darre
+ * @author
  */
 public class Main {
 

@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author darre
+ * @author
  */
 @Entity
 public class RentalRate implements Serializable {

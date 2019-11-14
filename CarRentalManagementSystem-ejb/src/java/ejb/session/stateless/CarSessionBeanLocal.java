@@ -10,14 +10,15 @@ import util.exception.CarModelDisabledException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.EntityDisabledException;
+import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 public interface CarSessionBeanLocal {
 
-    Car createNewCar(Car newCar, CarCategory carCategory, CarModel carModel, Outlet outlet) throws UnknownPersistenceException;
+    Car createNewCar(Car newCar, CarCategory carCategory, CarModel carModel, Outlet outlet) throws UnknownPersistenceException, InputDataValidationException;
 
-    Car createNewCar(Car newCar, Long categoryId, Long modelId, Long outletId) throws UnknownPersistenceException, EntityDisabledException, CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, CarModelDisabledException;
+    Car createNewCar(Car newCar, Long categoryId, Long modelId, Long outletId) throws UnknownPersistenceException, EntityDisabledException, CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, CarModelDisabledException, InputDataValidationException;
 
     List retrieveAllCars();
 

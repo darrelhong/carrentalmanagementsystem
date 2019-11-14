@@ -11,8 +11,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.enumeration.EmployeeType;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightsException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -24,15 +30,21 @@ import util.helper.Print;
  */
 public class SalesModule {
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+    
     private Employee currentEmployee;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
 
     public SalesModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public SalesModule(Employee currentEmployee, RentalRateSessionBeanRemote rrsbr,
             CarCategorySessionBeanRemote ccsbr) {
+        this();
         this.currentEmployee = currentEmployee;
         this.rentalRateSessionBeanRemote = rrsbr;
         this.carCategorySessionBeanRemote = ccsbr;
@@ -152,16 +164,32 @@ public class SalesModule {
             }
         }
 
-        try {
-            newRentalRate = rentalRateSessionBeanRemote.createRentalRate(newRentalRate, categoryId);
-            System.out.println("\nNew rate created!");
-            Print.printRate(newRentalRate);
-        } catch (CarCategoryNotFoundException | UnknownPersistenceException ex) {
-            System.out.println(ex.getMessage());
+        Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
+        
+        if (constraintViolations.isEmpty()) {
+            try {
+                newRentalRate = rentalRateSessionBeanRemote.createRentalRate(newRentalRate, categoryId);
+                System.out.println("\nNew rate created!");
+                Print.printRate(newRentalRate);
+            } catch (CarCategoryNotFoundException | UnknownPersistenceException | InputDataValidationException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            showInputDataValidationErrorsForRentalRate(constraintViolations);
         }
 
         System.out.println("\nPress Enter to continue...");
         sc.nextLine();
+    }
+    
+    private void showInputDataValidationErrorsForRentalRate(Set<ConstraintViolation<RentalRate>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
     }
 
     private void viewAllRentalRates() {

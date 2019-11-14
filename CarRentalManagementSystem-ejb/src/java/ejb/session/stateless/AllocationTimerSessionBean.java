@@ -7,7 +7,7 @@ import javax.ejb.Stateless;
 
 /**
  *
- * @author darre
+ * @author 
  */
 @Stateless
 public class AllocationTimerSessionBean implements AllocationSessionBeanRemote, AllocationSessionBeanLocal {

@@ -14,7 +14,7 @@ import util.exception.InvalidLoginCredentialsException;
 
 /**
  *
- * @author darre
+ * @author
  */
 public class MainApp {
 
