@@ -20,10 +20,6 @@ import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialsException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(CustomerSessionBeanLocal.class)
 @Remote(CustomerSessionBeanRemote.class)

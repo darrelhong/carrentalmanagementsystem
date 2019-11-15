@@ -9,10 +9,6 @@ import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRecordSessionBeanRemote;
 import javax.ejb.EJB;
 
-/**
- *
- * @author
- */
 public class Main {
 
     @EJB(name = "RentalRecordSessionBeanRemote")

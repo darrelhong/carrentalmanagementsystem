@@ -12,10 +12,6 @@ import javax.persistence.Query;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(CarCategorySessionBeanLocal.class)
 @Remote(CarCategorySessionBeanRemote.class)

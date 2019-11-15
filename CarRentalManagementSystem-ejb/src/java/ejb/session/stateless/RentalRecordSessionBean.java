@@ -31,10 +31,6 @@ import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.TransitNotAssignedException;
 import util.helper.Print;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(RentalRecordSessionBeanLocal.class)
 @Remote(RentalRecordSessionBeanRemote.class)

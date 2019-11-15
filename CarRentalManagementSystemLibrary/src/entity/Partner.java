@@ -14,10 +14,6 @@ import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlTransient;
 import util.enumeration.PartnerType;
 
-/**
- *
- * @author darre
- */
 @Entity
 public class Partner implements Serializable {
 

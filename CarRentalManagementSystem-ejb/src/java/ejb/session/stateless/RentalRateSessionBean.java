@@ -20,10 +20,6 @@ import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(RentalRateSessionBeanLocal.class)
 @Remote(RentalRateSessionBeanRemote.class)

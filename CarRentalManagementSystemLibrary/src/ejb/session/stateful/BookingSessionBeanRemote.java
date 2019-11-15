@@ -3,7 +3,6 @@ package ejb.session.stateful;
 import entity.Customer;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CustomerNotFoundException;

@@ -28,10 +28,6 @@ import ws.client.RentalRecord;
 import ws.client.RentalRecordNotFoundException_Exception;
 import ws.client.UnknownPersistenceException_Exception;
 
-/**
- *
- * @author darre
- */
 public class MainApp {
 
     Partner currentPartner;

@@ -20,10 +20,6 @@ import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(CarModelSessionBeanLocal.class)
 @Remote(CarModelSessionBeanRemote.class)

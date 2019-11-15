@@ -10,10 +10,6 @@ import util.exception.InvalidAccessRightsException;
 import util.exception.RentalRecordNotFoundException;
 import util.helper.Print;
 
-/**
- *
- * @author
- */
 public class CustomerServiceModule {
 
     private RentalRecordSessionBeanRemote rentalRecordSessionBeanRemote;

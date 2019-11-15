@@ -8,7 +8,6 @@ import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-
 public interface RentalRateSessionBeanRemote {
 
     RentalRate createRentalRate(RentalRate newRentalRate, Long carCategoryId) throws UnknownPersistenceException, CarCategoryNotFoundException, InputDataValidationException;

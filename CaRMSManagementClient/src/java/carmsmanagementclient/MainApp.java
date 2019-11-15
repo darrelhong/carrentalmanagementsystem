@@ -12,10 +12,6 @@ import java.util.Scanner;
 import util.exception.InvalidAccessRightsException;
 import util.exception.InvalidLoginCredentialsException;
 
-/**
- *
- * @author
- */
 public class MainApp {
 
     private CarSessionBeanRemote carSessionBeanRemote;

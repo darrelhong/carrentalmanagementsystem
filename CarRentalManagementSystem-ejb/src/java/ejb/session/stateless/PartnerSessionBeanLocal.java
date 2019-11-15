@@ -5,11 +5,6 @@ import util.exception.InvalidLoginCredentialsException;
 import util.exception.PartnerNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-
-/**
- *
- * @author darre
- */
 public interface PartnerSessionBeanLocal {
 
     Partner createNewPartner(Partner newPartner) throws UnknownPersistenceException;

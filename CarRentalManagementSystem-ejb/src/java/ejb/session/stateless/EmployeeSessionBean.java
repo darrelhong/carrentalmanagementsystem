@@ -13,10 +13,6 @@ import javax.persistence.Query;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialsException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(EmployeeSessionBeanLocal.class)
 @Remote(EmployeeSessionBeanRemote.class)

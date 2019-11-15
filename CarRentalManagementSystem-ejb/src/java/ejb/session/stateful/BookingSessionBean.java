@@ -31,10 +31,6 @@ import util.exception.OutletClosedException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateful
 @Local(BookingSessionBeanLocal.class)
 @Remote(BookingSessionBeanRemote.class)

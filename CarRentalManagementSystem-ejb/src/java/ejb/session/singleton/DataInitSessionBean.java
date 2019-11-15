@@ -35,10 +35,6 @@ import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Singleton
 @LocalBean
 @Startup
@@ -166,7 +162,7 @@ public class DataInitSessionBean {
             Car civicB3 = new Car("SS00B3HC", "red");
             carSessionBeanLocal.createNewCar(civicB1, standardSedan, civicModel, outletB);
             carSessionBeanLocal.createNewCar(civicB2, standardSedan, civicModel, outletB);
-            carSessionBeanLocal.createNewCar(civicB2, standardSedan, civicModel, outletB);
+            carSessionBeanLocal.createNewCar(civicB3, standardSedan, civicModel, outletB);
             Car sunnyC1 = new Car("SS00C1NS", "gold");
             Car sunnyC2 = new Car("SS00C2NS", "blue");
             Car sunnyC3 = new Car("SS00C3NS", "silver");

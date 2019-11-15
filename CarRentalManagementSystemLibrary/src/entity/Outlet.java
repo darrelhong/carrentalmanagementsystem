@@ -11,10 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author darre
- */
 @Entity
 public class Outlet implements Serializable {
 

@@ -37,10 +37,6 @@ import util.exception.RentalRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.helper.Print;
 
-/**
- *
- * @author
- */
 public class MainApp {
 
     private final ValidatorFactory validatorFactory;

@@ -37,10 +37,6 @@ import util.exception.TransitNotAssignedException;
 import util.exception.UnknownPersistenceException;
 import util.helper.Print;
 
-/**
- *
- * @author darre
- */
 public class OperationsModule {
     
     private final ValidatorFactory validatorFactory;

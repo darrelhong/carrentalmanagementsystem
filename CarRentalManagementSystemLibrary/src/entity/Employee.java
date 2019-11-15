@@ -15,10 +15,6 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 import util.enumeration.EmployeeType;
 
-/**
- *
- * @author darre
- */
 @Entity
 public class Employee implements Serializable {
 

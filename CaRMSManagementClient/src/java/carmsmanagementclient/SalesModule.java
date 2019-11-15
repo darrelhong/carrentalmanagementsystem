@@ -24,10 +24,6 @@ import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.helper.Print;
 
-/**
- *
- * @author darre
- */
 public class SalesModule {
 
     private final ValidatorFactory validatorFactory;

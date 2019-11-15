@@ -9,10 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-/**
- *
- * @author darre
- */
 @Entity
 public class TransitDispatchRecord implements Serializable {
 

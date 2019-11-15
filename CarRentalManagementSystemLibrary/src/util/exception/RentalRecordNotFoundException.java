@@ -1,9 +1,5 @@
 package util.exception;
 
-/**
- *
- * @author darre
- */
 public class RentalRecordNotFoundException extends Exception {
 
     /**

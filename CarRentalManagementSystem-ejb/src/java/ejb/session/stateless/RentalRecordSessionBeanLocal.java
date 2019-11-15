@@ -15,10 +15,6 @@ import util.exception.RentalRecordNotFoundException;
 import util.exception.TransitDispatchRecordNotFoundException;
 import util.exception.TransitNotAssignedException;
 
-/**
- *
- * @author darre
- */
 public interface RentalRecordSessionBeanLocal {
 
     List retrieveAllCustomerReservations(Customer customer) throws CustomerNotFoundException;

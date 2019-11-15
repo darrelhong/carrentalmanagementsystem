@@ -9,10 +9,6 @@ import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.RentalRecordSessionBeanRemote;
 import javax.ejb.EJB;
 
-/**
- *
- * @author
- */
 public class Main {
 
     @EJB(name = "RentalRecordSessionBeanRemote")
@@ -43,7 +39,6 @@ public class Main {
                 carSessionBeanRemote, carCategorySessionBeanRemote, outletSessionBeanRemote, rentalRateSessionBeanRemote,
         rentalRecordSessionBeanRemote);
         mainApp.runApp();
-        System.out.println("thdtr");
     }
     
 }

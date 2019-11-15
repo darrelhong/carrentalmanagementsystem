@@ -5,10 +5,6 @@ import java.util.List;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialsException;
 
-/**
- *
- * @author darre
- */
 public interface EmployeeSessionBeanLocal {
 
     Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException;

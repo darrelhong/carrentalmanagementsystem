@@ -1,9 +1,5 @@
 package holidayreservationsystem;
 
-/**
- *
- * @author darre
- */
 public class HolidayReservationSystem {
 
     /**

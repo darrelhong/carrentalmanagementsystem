@@ -7,10 +7,6 @@ import ws.client.CarModel;
 import ws.client.Outlet;
 import ws.client.RentalRecord;
 
-/**
- *
- * @author darre
- */
 public class Print {
 
     public static void printListRentalRecords(List<RentalRecord> records) {

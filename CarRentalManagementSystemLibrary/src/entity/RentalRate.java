@@ -17,10 +17,6 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author
- */
 @Entity
 public class RentalRate implements Serializable {
 

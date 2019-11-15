@@ -5,10 +5,6 @@ import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 
-/**
- *
- * @author 
- */
 @Stateless
 public class AllocationTimerSessionBean implements AllocationSessionBeanRemote, AllocationSessionBeanLocal {
 

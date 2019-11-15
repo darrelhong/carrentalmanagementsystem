@@ -31,10 +31,6 @@ import util.exception.PartnerNotFoundException;
 import util.exception.RentalRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @WebService(serviceName = "CaRMSWebService")
 @Stateless()
 public class CaRMSWebService {

@@ -26,10 +26,6 @@ import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(CarSessionBeanLocal.class)
 @Remote(CarSessionBeanRemote.class)

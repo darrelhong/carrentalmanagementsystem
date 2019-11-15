@@ -10,10 +10,6 @@ import entity.RentalRecord;
 import entity.TransitDispatchRecord;
 import java.util.List;
 
-/**
- *
- * @author darre
- */
 public class Print {
 
     public static void printListEmployees(List<Employee> employees) {

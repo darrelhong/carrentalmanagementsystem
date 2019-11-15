@@ -13,10 +13,6 @@ import javax.persistence.Query;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(OutletSessionBeanLocal.class)
 @Remote(OutletSessionBeanRemote.class)

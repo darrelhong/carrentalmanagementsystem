@@ -14,10 +14,6 @@ import util.exception.InvalidLoginCredentialsException;
 import util.exception.PartnerNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author 
- */
 @Stateless
 @Local(PartnerSessionBeanLocal.class)
 @Remote(PartnerSessionBeanRemote.class)

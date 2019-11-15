@@ -14,10 +14,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author darre
- */
 @Entity
 public class RentalRecord implements Serializable {
 
