@@ -126,12 +126,12 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         CarModel model = carModelSessionBeanLocal.retrieveCarModelById(modelId);
         bookingCarModel = model;
         Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(pickupOutletId);
-        if (pickupOutlet.getOpenTime() != null && start.getHours() < pickupOutlet.getOpenTime()) {
+        if (pickupOutlet.getOpenTime() != null && pickupOutlet.getCloseTime() != null && start.getHours() < pickupOutlet.getOpenTime() && start.getHours() > pickupOutlet.getCloseTime()) {
             throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " opens at " + String.format("%02d:00", pickupOutlet.getOpenTime()) + "H");
         }
         bookingPickupOutlet = pickupOutlet;
         Outlet returnOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(returnOutletId);
-        if (pickupOutlet.getOpenTime() != null && end.getHours() > returnOutlet.getCloseTime()) {
+        if (returnOutlet.getCloseTime() != null && returnOutlet.getOpenTime() != null && end.getHours() > returnOutlet.getCloseTime() && end.getHours() < returnOutlet.getOpenTime()) {
             throw new OutletClosedException("Outlet at " + pickupOutlet.getAddress() + " closes at " + String.format("%02d:00", pickupOutlet.getCloseTime()) + "H");
         }
         bookingReturnOutlet = returnOutlet;
