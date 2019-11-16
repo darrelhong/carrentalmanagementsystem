@@ -75,7 +75,7 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
         if (toCancel.getStartDateTime().before(new Date())) {
             throw new CancellationErrorException("Cannot cancel after rental period has started!");
         }
-        
+
         BigDecimal penalty = calculatePenalty(toCancel);
         toCancel.setPenaltyAmount(penalty);
         toCancel.setCancelled(true);
@@ -91,7 +91,7 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
 
     private BigDecimal calculatePenalty(RentalRecord toCancel) {
         try {
-             Date now = new Date();
+            Date now = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyyy hh:mm a");
             Date nowtemp = sdf.parse("1/1/2019 12:00 AM");
             BigDecimal result = new BigDecimal(0);
@@ -182,6 +182,8 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
                     car.setAvailabilityStatus(false);
                     rr.setCar(car);
                     car.getRentalRecords().add(rr);
+                    rr.setCarModel(car.getCarModel());
+                    car.getCarModel().getRentalRecords().add(rr);
                     // TRANSIT
                 } else {
                     System.out.println("TRANSIT");
@@ -194,6 +196,8 @@ public class RentalRecordSessionBean implements RentalRecordSessionBeanRemote, R
                         car.setAvailabilityStatus(false);
                         rr.setCar(car);
                         car.getRentalRecords().add(rr);
+                        rr.setCarModel(car.getCarModel());
+                        car.getCarModel().getRentalRecords().add(rr);
                         generateTransitRecord(rr, car);
                     } else {
                         System.out.println("Error no suitable cars available");

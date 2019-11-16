@@ -51,8 +51,11 @@ public class Print {
     }
 
     public static void printRentalRecord(RentalRecord r) {
-        System.out.printf("%10s%9s%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", "Booking ID", "Amount", "Make", "Model", "Start", "End", "From", "To", "Paid", "PickedUp", "Returned", "Cancelled");
-        System.out.printf("%10s%9.2f%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", r.getRentalRecordId(), r.getAmount(), r.getCarModel().getMake(), r.getCarModel().getModel(), r.getStartDateTime(), r.getEndDateTime(), r.getFromOutlet().getAddress(), r.getToOutlet().getAddress(), r.getPaid(), r.getPickedUp(), r.getReturned(), r.getCancelled());
+        System.out.printf("%10s%9s%20s%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", "Booking ID", "Amount", "Category", "Make", "Model", "Start", "End", "From", "To", "Paid", "PickedUp", "Returned", "Cancelled");
+        String make = r.getCarModel() != null ? r.getCarModel().getMake() : "";
+        String model = r.getCarModel() != null ? r.getCarModel().getModel() : "";
+        String category = r.getCarCategory() != null ? r.getCarCategory().getCarCategory() : r.getCarModel().getCarCategory().getCarCategory();
+        System.out.printf("%10s%9.2f%20s%20s%20s%31s%31s%32s%32s%6s%9s%9s%10s\n", r.getRentalRecordId(), r.getAmount(), category, make, model, r.getStartDateTime(), r.getEndDateTime(), r.getFromOutlet().getAddress(), r.getToOutlet().getAddress(), r.getPaid(), r.getPickedUp(), r.getReturned(), r.getCancelled());
     }
 
     public static void printListCarCategories(List<CarCategory> categories) {
