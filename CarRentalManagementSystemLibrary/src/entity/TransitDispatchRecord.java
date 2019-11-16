@@ -22,11 +22,10 @@ public class TransitDispatchRecord implements Serializable {
     @JoinColumn(nullable = false)
     private Outlet fromOutlet;
     
-    @OneToOne
+    @OneToOne(optional = false)
     private RentalRecord rentalRecord;
     
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(optional = true)
     private Employee employee;
 
     public TransitDispatchRecord() {

@@ -122,8 +122,10 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             throw new RentalRateNotFoundException("Rental rate ID " + rateId + " does not exist!");
         }
         // Rental rate only deleted when carcategory deleted
-        toDelete.setDisabled(true);
-        return 1;
+        toDelete.getCarCategory().getRentalRates().remove(toDelete);
+//        toDelete.setDisabled(true);
+        em.remove(toDelete);
+        return 0;
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {

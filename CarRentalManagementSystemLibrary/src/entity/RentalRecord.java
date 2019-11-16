@@ -70,7 +70,8 @@ public class RentalRecord implements Serializable {
     @ManyToOne(optional = true)
     private CarModel carModel;
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarCategory carCategory;
 
     public RentalRecord() {

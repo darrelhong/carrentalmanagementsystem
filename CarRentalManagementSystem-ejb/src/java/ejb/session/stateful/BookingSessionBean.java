@@ -123,6 +123,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
             throws CarCategoryNotFoundException, CarModelNotFoundException, OutletNotFoundException, NoRateFoundException, InsufficientInventoryException, OutletClosedException {
         bookingCarCatgory = null;
         CarCategory category = carCategorySessionBeanLocal.retrieveCarCategoryById(categoryId);
+        bookingCarCatgory = category;
         CarModel model = carModelSessionBeanLocal.retrieveCarModelById(modelId);
         bookingCarModel = model;
         Outlet pickupOutlet = outletSessionBeanLocal.retrieveOutletByOutletId(pickupOutletId);
@@ -195,17 +196,17 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
                 }
                 curr.setTime(curr.getTime() + 24 * 3600 * 1000);
             } else {
-                if (end.getDay() == curr.getDay()) {
-                    Query rentalRateQuery = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.disabled = FALSE AND (:curr BETWEEN r.startDate AND r.endDate OR (r.startDate IS NULL AND r.endDate IS NULL)) ORDER BY r.rate ASC");
-                    rentalRateQuery.setParameter("carCategoryId", categoryId);
-                    rentalRateQuery.setParameter("curr", curr);
-                    List<RentalRate> rentalRate = rentalRateQuery.setMaxResults(1).getResultList();
-                    if (rentalRate.isEmpty()) {
-                        throw new NoRateFoundException("No rate found for " + curr);
-                    } else {
-                        totalRate = totalRate.add(rentalRate.get(0).getRate());
-                    }
-                }
+//                if (end.getDay() == curr.getDay()) {
+//                    Query rentalRateQuery = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.disabled = FALSE AND (:curr BETWEEN r.startDate AND r.endDate OR (r.startDate IS NULL AND r.endDate IS NULL)) ORDER BY r.rate ASC");
+//                    rentalRateQuery.setParameter("carCategoryId", categoryId);
+//                    rentalRateQuery.setParameter("curr", curr);
+//                    List<RentalRate> rentalRate = rentalRateQuery.setMaxResults(1).getResultList();
+//                    if (rentalRate.isEmpty()) {
+//                        throw new NoRateFoundException("No rate found for " + curr);
+//                    } else {
+//                        totalRate = totalRate.add(rentalRate.get(0).getRate());
+//                    }
+//                }
                 break;
             }
         }
@@ -250,7 +251,7 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
         Partner partner = em.find(Partner.class, partnerId);
         Outlet pickupOutlet = em.find(Outlet.class, pickupOutletId);
         Outlet returnOutlet = em.find(Outlet.class, returnOutletId);
-        CarCategory carCategory;
+        CarCategory carCategory = em.find(CarCategory.class, categoryId);
         CarModel carModel;
         ExternalCustomer externalCustomer = new ExternalCustomer(externalCustName);
         try {
@@ -266,9 +267,9 @@ public class BookingSessionBean implements BookingSessionBeanRemote, BookingSess
             rr.setPartner(partner);
             partner.getRentalRecords().add(rr);
             if (modelId == 0) {
-                carCategory = em.find(CarCategory.class, categoryId);
                 rr.setCarCategory(carCategory);
             } else {
+                rr.setCarCategory(carCategory);
                 carModel = em.find(CarModel.class, modelId);
                 rr.setCarModel(carModel);
                 carModel.getRentalRecords().add(rr);

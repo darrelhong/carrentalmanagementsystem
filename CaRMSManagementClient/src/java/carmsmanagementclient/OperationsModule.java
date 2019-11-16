@@ -541,9 +541,6 @@ public class OperationsModule {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyyy hh:mm a");
                 System.out.print("Enter date (dd/mm/yyyy hh:mm AM/PM)> ");
                 time = sdf.parse(sc.nextLine().trim());
-
-                rentalRecordSessionBeanRemote.allocateCars(time);
-                System.out.println("Successful allocation!");
                 break;
             } catch (ParseException ex) {
                 System.out.println("Invalid date time input, please try again");
